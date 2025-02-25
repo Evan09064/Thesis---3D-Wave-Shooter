@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dce7907ac76ef404c81e90b2b67426af
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Projectiles/Rocket.asset
+  uploadId: 409462

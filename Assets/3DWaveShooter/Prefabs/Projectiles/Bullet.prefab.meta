@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d1698f6dcdc5555458c64228fac64542
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Projectiles/Bullet.prefab
+  uploadId: 409462

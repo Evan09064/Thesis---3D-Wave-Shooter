@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 04b0ed3810b75c746ad9b69aac6997b6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Environment/Cement.mat
+  uploadId: 409462

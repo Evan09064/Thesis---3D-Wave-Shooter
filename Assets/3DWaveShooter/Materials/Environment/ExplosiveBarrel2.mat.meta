@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 45f91191af1a1c34aa6f9a96af962d02
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Environment/ExplosiveBarrel2.mat
+  uploadId: 409462

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7c95a294dddc0c548b828ff6156b4aa6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Weapon/GunGrey_1.mat
+  uploadId: 409462

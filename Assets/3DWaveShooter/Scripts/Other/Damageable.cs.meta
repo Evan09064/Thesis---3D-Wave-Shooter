@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 886170c3648ee1141aaa311b4910ff6d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scripts/Other/Damageable.cs
+  uploadId: 409462

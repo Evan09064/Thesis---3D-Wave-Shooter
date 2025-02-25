@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a598d56b46caf47479453c988f445360
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Animations/Player/PlayerModel.controller
+  uploadId: 409462

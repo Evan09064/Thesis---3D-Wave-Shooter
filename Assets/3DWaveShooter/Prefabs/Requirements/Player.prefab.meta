@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f7b03d30a307d9849933169412e15d84
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Requirements/Player.prefab
+  uploadId: 409462

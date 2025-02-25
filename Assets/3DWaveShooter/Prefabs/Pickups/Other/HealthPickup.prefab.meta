@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c4258f7fb18fcaa478830d0d413dad6b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Pickups/Other/HealthPickup.prefab
+  uploadId: 409462

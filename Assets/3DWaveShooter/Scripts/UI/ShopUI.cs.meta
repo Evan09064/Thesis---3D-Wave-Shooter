@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 08bbc5ef57ab0a34b8685c46cf194d5b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scripts/UI/ShopUI.cs
+  uploadId: 409462

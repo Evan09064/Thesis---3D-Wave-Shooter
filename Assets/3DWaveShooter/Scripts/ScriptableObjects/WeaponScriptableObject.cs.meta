@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2b96fa8db6e2f3241bbf153c8a054b25
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scripts/ScriptableObjects/WeaponScriptableObject.cs
+  uploadId: 409462

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 12ac936be05a1e24daf429b40f0cc6f0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Environment/Rock_1.mat
+  uploadId: 409462

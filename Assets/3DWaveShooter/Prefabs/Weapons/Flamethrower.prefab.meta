@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bbff855987d23dd41993a0d9a8716977
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Weapons/Flamethrower.prefab
+  uploadId: 409462

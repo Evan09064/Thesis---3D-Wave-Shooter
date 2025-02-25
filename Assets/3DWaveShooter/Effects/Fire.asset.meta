@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ddd5adb86e2db1c4f9ad4baf4d1b3ded
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Effects/Fire.asset
+  uploadId: 409462

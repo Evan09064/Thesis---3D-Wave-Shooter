@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 460b4272574c7f945a0b02f8ad4f3078
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scenes/Levels/City.unity
+  uploadId: 409462

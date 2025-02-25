@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5812137755c090443a9493f39dae5c9c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Projectiles/Flame.asset
+  uploadId: 409462

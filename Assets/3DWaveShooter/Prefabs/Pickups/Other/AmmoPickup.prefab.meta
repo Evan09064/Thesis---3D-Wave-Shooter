@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9f236be02b153944286eb82bec263c51
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Pickups/Other/AmmoPickup.prefab
+  uploadId: 409462

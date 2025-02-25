@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5c7484f4ed43ed2419fc56e9cb3275f8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Weapon/GunSpecial_1.mat
+  uploadId: 409462

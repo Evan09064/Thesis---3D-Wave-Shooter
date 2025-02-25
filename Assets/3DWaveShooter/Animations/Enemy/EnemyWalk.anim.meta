@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6a2417ede0eadc44e9001368540d75d5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Animations/Enemy/EnemyWalk.anim
+  uploadId: 409462

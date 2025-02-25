@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 53099c73cf95ace4687906b2bab4edf1
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Weapons/RocketLauncher.prefab
+  uploadId: 409462

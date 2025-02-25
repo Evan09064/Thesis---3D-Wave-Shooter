@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7514fd54a5d01414f8bc1924ec2fab43
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Weapons/Pistol.asset
+  uploadId: 409462

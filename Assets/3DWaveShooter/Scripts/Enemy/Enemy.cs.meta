@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a4f3a2add93e3e74ab007b7159cd52ac
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scripts/Enemy/Enemy.cs
+  uploadId: 409462

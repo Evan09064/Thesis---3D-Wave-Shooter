@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: fcd68c3d3997ec6448760c5c6198f477
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Scripts/Other/ExplosionSphere.cs
+  uploadId: 409462

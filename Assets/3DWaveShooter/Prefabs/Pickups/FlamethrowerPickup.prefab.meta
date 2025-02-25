@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6f409cd67779ab44b8cd3b4fdcfa2fd0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Prefabs/Pickups/FlamethrowerPickup.prefab
+  uploadId: 409462

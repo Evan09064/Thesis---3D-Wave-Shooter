@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5fa02dad5a253a248a12d1ac44b29826
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Materials/Enemy/FastEnemy_Accent.mat
+  uploadId: 409462

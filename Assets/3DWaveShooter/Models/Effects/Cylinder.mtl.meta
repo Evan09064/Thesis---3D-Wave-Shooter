@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 87dd9ffd5ec8cfd42b9624b6f6505d30
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 133749
+  packageName: 3D Wave Shooter
+  packageVersion: 1.2.4
+  assetPath: Assets/3DWaveShooter/Models/Effects/Cylinder.mtl
+  uploadId: 409462
