@@ -24,13 +24,30 @@ public class Explosion : MonoBehaviour
         //Get all objects in the explosive range.
         RaycastHit[] hits = Physics.SphereCastAll(source, data.explosiveRange, Vector3.up);
 
+        bool hitAtLeastOneEnemy = false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider.CompareTag("Enemy"))
+            {
+                hitAtLeastOneEnemy = true;
+                break;
+            }
+        }
+        
+        // For rocket launcher explosions, we want to count one accurate hit if any enemy is affected.
+        if (hitAtLeastOneEnemy)
+        {
+            PerformanceStats.RoundShotsHit++;
+            PerformanceStats.OverallShotsHit++;
+        }
+
         //Loop through them all.
         for(int i = 0; i < hits.Length; ++i)
         {
             //If it's an enemy, damage them.
             if(hits[i].collider.tag == "Enemy")
             {
-                hits[i].collider.GetComponent<Enemy>().TakeDamage(data.explosiveDamage);
+                hits[i].collider.GetComponent<Enemy>().TakeDamage(data.explosiveDamage, false);
             }
             else if(hits[i].collider.tag == "Damageable")
             {
