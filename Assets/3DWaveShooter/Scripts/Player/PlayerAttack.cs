@@ -110,8 +110,15 @@ public class PlayerAttack : MonoBehaviour
     //Called for the weapon to shoot.
     void Shoot ()
     {
+        if (!GameManager.inst.waveInProgress)
+            return;
+        // Increment counter for every shot fired.
+        PerformanceStats.RoundShotsFired++;
+        PerformanceStats.OverallShotsFired++;
+
         Weapon weapon = Player.inst.curWeapon;
         ProjectileScriptableObject proj = weapon.projectile;
+
 
         //Are we shooting a physical projectile?
         if(Player.inst.curWeapon.projectile.type == ProjectileType.Projectile)

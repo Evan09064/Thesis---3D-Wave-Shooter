@@ -10,10 +10,31 @@ public class PlayerMovement : MonoBehaviour
     [Header("Components")]
     public Rigidbody rig;                   //Player's rigidbody component.
 
+    [Header("Movement Metrics")]
+    public float movingSpeedThreshold = 0.1f; // Speed threshold to consider the player "moving"
+    
+    // Metrics for tracking movement.
+    public float totalDistanceTraveled = 0f;
+    public float totalTimeMoving = 0f;
+    public float totalTimeIdle = 0f;
+    
+    // For path efficiency calculations.
+    private Vector3 waveStartPosition;
+    
+    // To track movement frame-to-frame.
+    private Vector3 lastPosition;
+
     void Awake ()
     {
         //Get missing components
         if(!rig) rig = GetComponent<Rigidbody>();
+    }
+
+     void Start ()
+    {
+        // Initialize tracking variables.
+        lastPosition = transform.position;
+        waveStartPosition = transform.position;  // Set at the beginning of a new round or wave.
     }
 
     void Update ()
@@ -37,6 +58,9 @@ public class PlayerMovement : MonoBehaviour
     //Moves the player based on keyboard inputs.
     void Move ()
     {
+        // Only update movement metrics when the wave is active.
+        if (!GameManager.inst.waveInProgress)
+            return;
         //Get the horizontal and vertical keyboard inputs.
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
@@ -68,6 +92,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if(dir.magnitude > 0)
             {
+                totalTimeMoving += Time.deltaTime;
+
                 if(Player.inst.state != PlayerState.Moving)
                 {
                     Player.inst.state = PlayerState.Moving;
@@ -76,17 +102,31 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
+                totalTimeIdle += Time.deltaTime;
+
                 if(Player.inst.state != PlayerState.Idle)
                 {
                     Player.inst.state = PlayerState.Idle;
                     Player.inst.anim.SetBool("Moving", false);
+                    totalTimeIdle += Time.deltaTime;
                 }
             }
         }
 
         //Finally set that as the player's velocity, also including the player's move speed.
         rig.linearVelocity = dir * Player.inst.moveSpeed;
+    
+        // ===== Movement Metrics Tracking (MY CODE) =====
+
+        // Current position and distance moved since last frame.
+        Vector3 currentPosition = transform.position;
+        float distanceThisFrame = Vector3.Distance(currentPosition, lastPosition);
+        totalDistanceTraveled += distanceThisFrame;
+
+        // Update last position.
+        lastPosition = currentPosition;
     }
+
 
     //Rotate the player so they're facing the mouse cursor.
     void Look ()
@@ -128,5 +168,16 @@ public class PlayerMovement : MonoBehaviour
                 transform.rotation = Quaternion.Euler(transform.rotation.x, angle, transform.rotation.z);
             }
         }
+    }
+    public float AverageSpeed ()
+    {
+        return totalTimeMoving > 0 ? totalDistanceTraveled / totalTimeMoving : 0f;
+    }
+
+    // Helper method to calculate path efficiency.
+    public float PathEfficiency ()
+    {
+        float straightLineDistance = Vector3.Distance(waveStartPosition, transform.position);
+        return totalDistanceTraveled > 0 ? straightLineDistance / totalDistanceTraveled : 0f;
     }
 }

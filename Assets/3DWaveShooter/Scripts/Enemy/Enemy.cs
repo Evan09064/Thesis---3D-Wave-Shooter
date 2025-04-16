@@ -61,8 +61,14 @@ public class Enemy : MonoBehaviour
     }
 
     //Called when the enemy gets damaged from any source in the world.
-    public void TakeDamage (int damage)
+    public void TakeDamage (int damage, bool countAccuracy = true)
     {
+        if(countAccuracy)
+        {
+            PerformanceStats.RoundShotsHit++;
+            PerformanceStats.OverallShotsHit++;
+        }
+
         if(curHp - damage > 0)
         {
             curHp -= damage;
@@ -73,13 +79,18 @@ public class Enemy : MonoBehaviour
                 Die();
         }
 
-        //Particle effect.
         Pool.Spawn(ParticleManager.inst.bloodImpact, transform.position, Quaternion.identity);
     }
 
     //Called when the enemy gets damaged from any source in the world.
-    public void TakeDamage (int damage, Vector3 impactPos, Vector3 forward)
+    public void TakeDamage (int damage, Vector3 impactPos, Vector3 forward, bool countAccuracy = true)
     {
+        if(countAccuracy)
+        {
+            PerformanceStats.RoundShotsHit++;
+            PerformanceStats.OverallShotsHit++;
+        }
+
         if(curHp - damage > 0)
         {
             curHp -= damage;
@@ -90,10 +101,7 @@ public class Enemy : MonoBehaviour
                 Die();
         }
 
-        //Particle effect.
         Pool.Spawn(ParticleManager.inst.bloodImpact, impactPos, Quaternion.identity).transform.forward = forward;
-
-        //Sound effect.
         AudioManager.inst.Play(audioSource, AudioManager.inst.enemyImpactSFX[Random.Range(0, AudioManager.inst.enemyImpactSFX.Length)]);
     }
 

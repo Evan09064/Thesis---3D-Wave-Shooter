@@ -32,6 +32,9 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;                 //Player's Audio Source component.
     public Animator anim;                           //Player's Animator component.
     public MeshSetter meshSetter;                   //Player's MeshSetter.cs component.
+    public float currentWeaponEquipTime;
+    public bool isDead = false;
+
 
     //Instance
     public static Player inst;                      //We create an instance (singelton) of the player so that it can be accessed from anywhere.
@@ -53,6 +56,15 @@ public class Player : MonoBehaviour
     void Update ()
     {
         CheckInputs();
+        // Accumulate active weapon time if the game is in progress.
+        if(GameManager.inst.waveInProgress && GameManager.inst.gameIsActive && curWeapon != null && !string.IsNullOrEmpty(curWeapon.displayName))
+        {
+            // Update the usage time per frame.
+            if(WeaponUsageStats.WeaponUsageTimes.ContainsKey(curWeapon.displayName))
+                WeaponUsageStats.WeaponUsageTimes[curWeapon.displayName] += Time.deltaTime;
+            else
+                WeaponUsageStats.WeaponUsageTimes[curWeapon.displayName] = Time.deltaTime;
+        }
     }
 
     //Checks for keyboard inputs.
@@ -68,6 +80,10 @@ public class Player : MonoBehaviour
     //Called when the player takes damage. From enemies or any other source in the world.
     public void TakeDamage (int damage)
     {
+        // Update damage counters.
+        PerformanceStats.OverallDamageTaken += damage;
+        PerformanceStats.RoundDamageTaken += damage;
+        
         if(curHp - damage > 0)
             curHp -= damage;
         else
@@ -89,6 +105,9 @@ public class Player : MonoBehaviour
     //Called when the player's health reaches 0. Kills them. Game over.
     public void Die ()
     {
+        if (isDead)
+            return;
+        isDead = true;
         curHp = 0;
         canMove = false;
         canAttack = false;
@@ -115,6 +134,13 @@ public class Player : MonoBehaviour
 
         weapons.Add(weapon);
 
+        if (!WeaponUsageStats.WeaponUsageCounts.ContainsKey(weapon.displayName))
+        {
+            WeaponUsageStats.WeaponUsageCounts[weapon.displayName] = 1;
+        }
+
+
+
         //Is this weapon not already linked to a player weapon visual?
         if(!weapon.onPlayerVisual)
         {
@@ -132,6 +158,9 @@ public class Player : MonoBehaviour
     //dir is the direction of change (1 = next, -1 = last).
     void TryChangeWeapon (int dir)
     {
+        if (!GameManager.inst.waveInProgress)
+            return;
+
         int nextIndex = weapons.IndexOf(curWeapon) + dir;
 
         if(nextIndex < 0)
@@ -147,8 +176,18 @@ public class Player : MonoBehaviour
     //Equips the requested weapon, changing values that are needed and visuals.
     public void EquipWeapon (Weapon weapon)
     {
+        if(curWeapon == weapon)
+        {
+            return;
+        }
+        
         Weapon prevWeapon = curWeapon;
         curWeapon = weapon;
+
+        if(GameManager.inst.waveInProgress)
+        {
+            WeaponUsageStats.RecordWeaponUsage(weapon.displayName);
+        }
 
         //Disable previous weapon visual, and enable the new one.
         if(prevWeapon != null)

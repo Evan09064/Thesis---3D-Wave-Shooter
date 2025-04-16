@@ -11,6 +11,8 @@ public class Projectile : MonoBehaviour
 
     public EffectScriptableObject[] effects;    //Effects applied to hit entities.
 
+    private bool rocketAccuracyRegistered = false;
+
     private bool valuesSet;                     //Used for knowing if the projectile has its value set.
 
     void OnEnable ()
@@ -27,10 +29,38 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter (Collider col)
     {
+        // Check if this projectile is explosive (i.e. has an explosive effect)
+        bool isExplosive = false;
+        for (int i = 0; i < effects.Length; i++)
+        {
+            if(effects[i].explosive)
+            {
+                isExplosive = true;
+                break;
+            }
+        }
+
         //Did we hit an enemy?
         if(col.tag == "Enemy")
         {
-            col.GetComponent<Enemy>().TakeDamage(damage, transform.position, -Player.inst.transform.forward);
+            if(isExplosive)
+            {
+                if(!rocketAccuracyRegistered)
+                {
+                    PerformanceStats.RoundShotsHit++;
+                    PerformanceStats.OverallShotsHit++;
+                    rocketAccuracyRegistered = true;
+                }
+                // Pass 'false' so that this damage call doesn't add accuracy again.
+                col.GetComponent<Enemy>().TakeDamage(damage, transform.position, -Player.inst.transform.forward, false);
+            }
+            else
+            {
+                // Normal projectile behavior
+                col.GetComponent<Enemy>().TakeDamage(damage, transform.position, -Player.inst.transform.forward);
+            }
+            
+            
             col.GetComponent<Rigidbody>().AddForce((col.transform.position - transform.position).normalized * knockback, ForceMode.Impulse);
 
             for(int i = 0; i < effects.Length; ++i)
