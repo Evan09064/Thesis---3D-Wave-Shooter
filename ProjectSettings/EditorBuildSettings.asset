@@ -5,9 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/3DWaveShooter/Scenes/Menu.unity
     guid: 0952ba1e92ad5ac42822d51fde4c638c
@@ -17,4 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/3DWaveShooter/Scenes/Levels/City.unity
     guid: 460b4272574c7f945a0b02f8ad4f3078
+  - enabled: 1
+    path: Assets/3DWaveShooter/Scenes/Levels/Ruins.unity
+    guid: 314106f9b746b4a468e84b876d443aa6
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
