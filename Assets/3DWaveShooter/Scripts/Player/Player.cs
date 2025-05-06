@@ -84,16 +84,16 @@ public class Player : MonoBehaviour
         PerformanceStats.OverallDamageTaken += damage;
         PerformanceStats.RoundDamageTaken += damage;
         
-        if(curHp - damage > 0)
-            curHp -= damage;
-        else
-            Die();
+        //Instead of losing health, Player will lose 10 units of money 
+        money -= 10;
+        if (money < 0) money = 0;
 
         //Sound effect.
         AudioManager.inst.Play(audioSource, AudioManager.inst.playerImpactSFX[Random.Range(0, AudioManager.inst.playerImpactSFX.Length)]);
 
         //Update UI.
         GameUI.inst.UpdateHealthBar();
+        // GameUI.inst.UpdateMoneyText();
 
         //Cam Shake
         CameraEffects.inst.Shake(0.1f, 0.1f, 10.0f);

@@ -1,14 +1,5 @@
 fileFormatVersion: 2
 guid: 9bb831dda3e67ed4ebdbfa33bbd1aa2c
-MonoImporter:
-  externalObjects: {}
-  serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
-  icon: {instanceID: 0}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
   productId: 133749
@@ -16,3 +7,19 @@ AssetOrigin:
   packageVersion: 1.2.4
   assetPath: Assets/3DWaveShooter/Scripts/Player/Player.cs
   uploadId: 409462
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - startingWeapon: {instanceID: 0}
+  - weaponPos: {instanceID: 0}
+  - movement: {instanceID: 0}
+  - attack: {instanceID: 0}
+  - audioSource: {instanceID: 0}
+  - anim: {instanceID: 0}
+  - meshSetter: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

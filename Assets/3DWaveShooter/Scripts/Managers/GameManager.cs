@@ -63,6 +63,10 @@ public class GameManager : MonoBehaviour
         PerformanceStats.OverallShotsHit = 0;
         PerformanceStats.RoundShotsFired = 0;
         PerformanceStats.RoundShotsHit = 0;
+        PerformanceStats.CompletedWaves = 0;
+        PerformanceStats.OverallDamageTaken = 0;
+        PerformanceStats.RoundDamageTaken = 0;
+        PerformanceStats.OverallWaveTime = 0f;
         Player.inst.movement.totalDistanceTraveled = 0f;
         Player.inst.movement.totalTimeMoving = 0f;
         Player.inst.movement.totalTimeIdle = 0f;
@@ -186,6 +190,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("Wave Completed in: " + PerformanceStats.CurrentWaveCompletionTime + " Seconds");
         Debug.Log("Damage taken this wave: " + PerformanceStats.RoundDamageTaken + " HP's");
 
+        //check wave to award end of wave bonus
+        if(waveCount == 1)
+            Player.inst.AddMoney(50);
         //Was this the last wave? Then we win!
         if(EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length)
             WinGame();

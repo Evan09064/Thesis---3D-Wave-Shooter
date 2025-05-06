@@ -121,6 +121,70 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &103004664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 103004666}
+  - component: {fileID: 103004665}
+  m_Layer: 0
+  m_Name: NavMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &103004665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103004664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
+--- !u!4 &103004666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 103004664}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 176.9849, y: 198.79846, z: 201.0906}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &562082348
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -160,6 +224,11 @@ PrefabInstance:
     - target: {fileID: 4429243137630626, guid: f7b03d30a307d9849933169412e15d84, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114113315879442366, guid: f7b03d30a307d9849933169412e15d84,
+        type: 3}
+      propertyPath: startingWeapon
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -301,6 +370,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4971929948315372, guid: e1d73536571b6e64ca162039b530b8fc, type: 3}
       propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: level
+      value: 
+      objectReference: {fileID: 11400000, guid: d80bf4234a57adb4aae05681f61e110f,
+        type: 2}
+    - target: {fileID: 114663823201920228, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: refillAmmoCost
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114663823201920228, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: moveSpeedUpgrade.canUpgrade
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -516,3 +601,4 @@ SceneRoots:
   - {fileID: 1700164669}
   - {fileID: 562082348}
   - {fileID: 1475949827}
+  - {fileID: 103004666}
