@@ -190,6 +190,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("Wave Completed in: " + PerformanceStats.CurrentWaveCompletionTime + " Seconds");
         Debug.Log("Damage taken this wave: " + PerformanceStats.RoundDamageTaken + " HP's");
 
+        //check wave to award end of wave bonus
+        if(waveCount == 1)
+            Player.inst.AddMoney(50);
         //Was this the last wave? Then we win!
         if(EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length)
             WinGame();

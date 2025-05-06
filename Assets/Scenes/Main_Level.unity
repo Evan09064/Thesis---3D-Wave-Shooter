@@ -225,6 +225,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114113315879442366, guid: f7b03d30a307d9849933169412e15d84,
+        type: 3}
+      propertyPath: startingWeapon
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -373,6 +378,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d80bf4234a57adb4aae05681f61e110f,
         type: 2}
+    - target: {fileID: 114663823201920228, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: refillAmmoCost
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 114663823201920228, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: moveSpeedUpgrade.canUpgrade
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
