@@ -20,7 +20,11 @@ public class GameManager : MonoBehaviour
     public float prevDistanceTraveled = 0f;
     public float prevTimeMoving = 0f;
     public float prevTimeIdle = 0f;
-// Optionally, you can store other metrics if needed.
+    private int prevWeaponSwitchCount = 0;
+    private const float PI_CUT      = -0.1727f;
+    private const float MVI_CUT     =  2.2081f;
+    private const float DPM_CUT     =  6.1254f;
+    private const float SWITCH_CUT  = 2f;
 
 
 
@@ -28,13 +32,62 @@ public class GameManager : MonoBehaviour
     public bool waveInProgress;
 
     [Header("Wave Start Conditions")]
-    public bool refillHealthOnNewWave;
+
+    [Header("Playstyle Countermeasures")]
+    /// <summary>Prefab of a low‐cover crate to help Low‐Skill, High‐Move players.</summary>
+    public GameObject rockCoverPrefab;
+    public float     minSpawnDistance = 2f;
+    public float     maxSpawnDistance = 5f;
+    public float     checkRadius      = 1f;    // radius of sphere to test overlaps
+    public float     rockScaleFactor  = 0.5f;  // shrink prefab by 50%
+
+    
     public bool refillAmmoOnNewWave;
 
     //Instance
     public static GameManager inst;
 
     public PerformanceDataOverall overallData = new PerformanceDataOverall();
+
+    private List<PerformanceDataPerWave> calibrationWaves = new List<PerformanceDataPerWave>();
+
+    private PerformanceDataPerWave BuildWaveData(int waveNum) {
+    // pull out all your currentDistance/currentTimeMoving/etc logic
+    float currentDistance   = Player.inst.movement.totalDistanceTraveled;
+    float currentTimeMoving = Player.inst.movement.totalTimeMoving;
+    float currentTimeIdle   = Player.inst.movement.totalTimeIdle;
+    float waveTime          = PerformanceStats.CurrentWaveCompletionTime;
+    float waveDistance      = currentDistance - prevDistanceTraveled;
+    float waveTimeMoving    = currentTimeMoving - prevTimeMoving;
+    float waveTimeIdle      = currentTimeIdle   - prevTimeIdle;
+    float waveAvgSpeed      = waveTimeMoving > 0f
+                              ? waveDistance / waveTimeMoving
+                              : 0f;
+    float wavePathEff       = Player.inst.movement.PathEfficiency();
+    int currentSwitchCount = WeaponUsageStats.WeaponSwitchCount;
+    int waveSwitchCount    = currentSwitchCount - prevWeaponSwitchCount;
+
+    // update the “prev” trackers
+    prevDistanceTraveled = currentDistance;
+    prevTimeMoving      = currentTimeMoving;
+    prevTimeIdle        = currentTimeIdle;
+    prevWeaponSwitchCount = currentSwitchCount;
+
+    // build and return
+    return new PerformanceDataPerWave {
+        waveNumber         = waveNum,
+        waveAccuracy       = PerformanceStats.RoundAccuracy,
+        waveTime           = waveTime,
+        waveDamageTaken    = PerformanceStats.RoundDamageTaken,
+        waveSpeed          = waveAvgSpeed,
+        waveDistanceTraveled = waveDistance,
+        waveTimeIdle       = waveTimeIdle,
+        waveTimeMoving     = waveTimeMoving,
+        wavePathEfficiency = wavePathEff,
+        waveWeaponSwitches = waveSwitchCount
+    };
+}
+
 
 
     void Awake ()
@@ -54,6 +107,12 @@ public class GameManager : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Escape))
             SceneManager.LoadScene(0);
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+        Debug.Log("[DEBUG] Spawning test cover crates");
+        StartCoroutine(SpawnRockCover(4, 0.5f));
+        }
     }
 
     //Called when the game starts.
@@ -71,6 +130,9 @@ public class GameManager : MonoBehaviour
         Player.inst.movement.totalTimeMoving = 0f;
         Player.inst.movement.totalTimeIdle = 0f;
         Player.inst.isDead = false;
+        WeaponUsageStats.WeaponSwitchCount = 0;
+        WeaponUsageStats.ResetWeaponUsage();
+        prevWeaponSwitchCount = 0;
 
         
     
@@ -99,9 +161,6 @@ public class GameManager : MonoBehaviour
         Player.inst.currentWeaponEquipTime = Time.time;
         gameIsActive = true;
         waveInProgress = true;
-        //If we refill health, do it.
-        if(refillHealthOnNewWave)
-            Player.inst.curHp = Player.inst.maxHp;
 
         //Same with ammo for all weapons.
         if(refillAmmoOnNewWave)
@@ -111,88 +170,32 @@ public class GameManager : MonoBehaviour
         PerformanceStats.ResetRoundStats();
         EnemySpawner.inst.SetNewWave();
         Player.inst.canMove = true;
+
+        if (waveCount == 3)
+        {
+            EvaluatePlaystyleAndConfigure();
+        }
+
     }
-
-    private void CaptureFinalWaveMetrics() {
-    
-    PerformanceStats.EndWave();
-    // Calculate per-wave metrics:
-    float currentDistance = Player.inst.movement.totalDistanceTraveled;
-    float currentTimeMoving = Player.inst.movement.totalTimeMoving;
-    float currentTimeIdle = Player.inst.movement.totalTimeIdle;
-    float waveTime = PerformanceStats.CurrentWaveCompletionTime;
-
-    float waveDistance = currentDistance - prevDistanceTraveled;
-    float waveTimeMoving = currentTimeMoving - prevTimeMoving;
-    float waveTimeIdle = currentTimeIdle - prevTimeIdle;
-    float waveAverageSpeed = waveTimeMoving > 0 ? waveDistance / waveTimeMoving : 0f;
-    float wavePathEfficiency = Player.inst.movement.PathEfficiency();
-
-    // Create a PerformanceDataPerWave object and add it to the overall list:
-    PerformanceDataPerWave finalWaveData = new PerformanceDataPerWave();
-    finalWaveData.waveNumber = waveCount;  
-    finalWaveData.waveAccuracy = PerformanceStats.RoundAccuracy;
-    finalWaveData.waveTime = waveTime;
-    finalWaveData.waveDamageTaken = PerformanceStats.RoundDamageTaken;
-    finalWaveData.waveSpeed = waveAverageSpeed;
-    finalWaveData.waveDistanceTraveled = waveDistance;
-    finalWaveData.waveTimeIdle = waveTimeIdle;
-    finalWaveData.waveTimeMoving = waveTimeMoving;
-    finalWaveData.wavePathEfficiency = wavePathEfficiency;
-
-    overallData.waveMetrics.Add(finalWaveData);
-}
-
 
     //Called when the wave is over.
     public void EndWave ()
     {
         waveInProgress = false;
+        PerformanceStats.EndWave();   // finishes timing + increments CompletedWaves
 
-        // Calculate per-wave metrics:
-        float currentDistance = Player.inst.movement.totalDistanceTraveled;
-        float currentTimeMoving = Player.inst.movement.totalTimeMoving;
-        float currentTimeIdle = Player.inst.movement.totalTimeIdle;
-
-        float waveDistance = currentDistance - prevDistanceTraveled;
-        float waveTimeMoving = currentTimeMoving - prevTimeMoving;
-        float waveTimeIdle = currentTimeIdle - prevTimeIdle;
-        float waveAverageSpeed = waveTimeMoving > 0 ? waveDistance / waveTimeMoving : 0f;
-        float wavePathEfficiency = Player.inst.movement.PathEfficiency(); // Assuming this method calculates using the wave start position set at round start.
-
-        // Log per-wave metrics:
-        Debug.Log("Wave Distance Traveled: " + waveDistance + "Unity units/meters");
-        Debug.Log("Wave Average Speed (while moving): " + waveAverageSpeed + "Unity units/meters per second");
-        Debug.Log("Wave Path Efficiency: " + wavePathEfficiency);
-        Debug.Log("Wave Time Moving: " + waveTimeMoving + " seconds; Wave Time Idle: " + waveTimeIdle + " seconds");
-
-        prevDistanceTraveled = currentDistance;
-        prevTimeMoving = currentTimeMoving;
-        prevTimeIdle = currentTimeIdle;
-
-        roundAccuracy = PerformanceStats.RoundAccuracy;
-        PerformanceStats.EndWave();
-
-        PerformanceDataPerWave waveData = new PerformanceDataPerWave();
-        waveData.waveNumber = waveCount;  // current wave number
-        waveData.waveAccuracy = PerformanceStats.RoundAccuracy;
-        waveData.waveTime = PerformanceStats.CurrentWaveCompletionTime;
-        waveData.waveDamageTaken = PerformanceStats.RoundDamageTaken;
-        waveData.waveSpeed = waveAverageSpeed;
-        waveData.waveDistanceTraveled = waveDistance;
-        waveData.waveTimeIdle = waveTimeIdle;
-        waveData.waveTimeMoving = waveTimeMoving;
-        waveData.wavePathEfficiency = wavePathEfficiency;
-
+        // 1) build the wave object
+        var waveData = BuildWaveData(waveCount);
         overallData.waveMetrics.Add(waveData);
 
-        Debug.Log("Wave Accuracy: " + PerformanceStats.RoundAccuracy);
-        Debug.Log("Wave Completed in: " + PerformanceStats.CurrentWaveCompletionTime + " Seconds");
-        Debug.Log("Damage taken this wave: " + PerformanceStats.RoundDamageTaken + " HP's");
+        // 2) award completion bonus etc...
+        if (waveCount == 1)    Player.inst.AddMoney(50);
 
-        //check wave to award end of wave bonus
-        if(waveCount == 1)
-            Player.inst.AddMoney(50);
+        // 3) calibration logic:
+        if (waveCount == 1 || waveCount == 2) 
+        {
+            calibrationWaves.Add(waveData);
+        }
         //Was this the last wave? Then we win!
         if(EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length)
             WinGame();
@@ -211,28 +214,11 @@ public class GameManager : MonoBehaviour
         gameIsActive = false;
         waveInProgress = false;
         roundAccuracy = PerformanceStats.OverallAccuracy;
-        Debug.Log("____________GAME OVER___________");
-        Debug.Log("Game ended. Accuracy: " + PerformanceStats.OverallAccuracy);
-        Debug.Log("Overall time: " + PerformanceStats.OverallWaveTime);
-        Debug.Log("Average time per wave: " + PerformanceStats.AverageWaveCompletionTime);
-        Debug.Log("Overall Damage Taken: " + PerformanceStats.OverallDamageTaken);
-        Debug.Log("Average Speed (while moving): " + Player.inst.movement.AverageSpeed());
-        Debug.Log("Total Distance Traveled: " + Player.inst.movement.totalDistanceTraveled);
-        Debug.Log("Path Efficiency: " + Player.inst.movement.PathEfficiency());
-        Debug.Log("Time Moving: " + Player.inst.movement.totalTimeMoving + " seconds; Time Idle: " + Player.inst.movement.totalTimeIdle + " seconds");
-
-        foreach(var entry in WeaponUsageStats.WeaponUsageCounts)
-        {
-            Debug.Log("Weapon: " + entry.Key + " used " + entry.Value + " times.");
-        }
 
         // Update current weapon usage before ending.
     
         // Log weapon usage time.
         foreach(var entry in WeaponUsageStats.WeaponUsageTimes)
-        {
-            Debug.Log("Weapon: " + entry.Key + " used for " + entry.Value + " seconds.");
-        }
 
         //Logging all performance metrics
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
@@ -245,6 +231,7 @@ public class GameManager : MonoBehaviour
         overallData.totalDistanceTraveled = Player.inst.movement.totalDistanceTraveled;
         overallData.totalTimeMoving = Player.inst.movement.totalTimeMoving;
         overallData.totalTimeIdle = Player.inst.movement.totalTimeIdle;
+        overallData.overallWeaponSwitches = WeaponUsageStats.WeaponSwitchCount;
         overallData.pathEfficiency = Player.inst.movement.PathEfficiency();
         if(WeaponUsageStats.WeaponUsageCounts.ContainsKey("Pistol"))
             overallData.pistolUses = WeaponUsageStats.WeaponUsageCounts["Pistol"];
@@ -286,31 +273,8 @@ public class GameManager : MonoBehaviour
     {
         gameIsActive = false;
         waveInProgress = false;
-        CaptureFinalWaveMetrics();
+        //CaptureFinalWaveMetrics();
         roundAccuracy = PerformanceStats.OverallAccuracy;
-        Debug.Log("____________GAME OVER___________");
-        Debug.Log("Game ended. Accuracy: " + PerformanceStats.OverallAccuracy);
-        Debug.Log("Overall time: " + PerformanceStats.OverallWaveTime);
-        Debug.Log("Average time per wave: " + PerformanceStats.AverageWaveCompletionTime);
-        Debug.Log("Overall Damage Taken: " + PerformanceStats.OverallDamageTaken);
-        Debug.Log("Average Speed (while moving): " + Player.inst.movement.AverageSpeed());
-        Debug.Log("Total Distance Traveled: " + Player.inst.movement.totalDistanceTraveled);
-        Debug.Log("Path Efficiency: " + Player.inst.movement.PathEfficiency());
-        Debug.Log("Time Moving: " + Player.inst.movement.totalTimeMoving + " seconds; Time Idle: " + Player.inst.movement.totalTimeIdle + " seconds");
-
-        foreach(var entry in WeaponUsageStats.WeaponUsageCounts)
-        {
-            Debug.Log("Weapon: " + entry.Key + " used " + entry.Value + " times.");
-        }
-
-        // Update current weapon usage before ending.
-    
-        // Log weapon usage time.
-        foreach(var entry in WeaponUsageStats.WeaponUsageTimes)
-        {
-            Debug.Log("Weapon: " + entry.Key + " used for " + entry.Value + " seconds.");
-        }
-        //Logging all performance metrics
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
         overallData.totalRoundTime = PerformanceStats.OverallWaveTime;
         overallData.averageRoundTime = PerformanceStats.AverageWaveCompletionTime;
@@ -321,6 +285,7 @@ public class GameManager : MonoBehaviour
         overallData.totalDistanceTraveled = Player.inst.movement.totalDistanceTraveled;
         overallData.totalTimeMoving = Player.inst.movement.totalTimeMoving;
         overallData.totalTimeIdle = Player.inst.movement.totalTimeIdle;
+        overallData.overallWeaponSwitches = WeaponUsageStats.WeaponSwitchCount;
         overallData.pathEfficiency = Player.inst.movement.PathEfficiency();
         if(WeaponUsageStats.WeaponUsageCounts.ContainsKey("Pistol"))
             overallData.pistolUses = WeaponUsageStats.WeaponUsageCounts["Pistol"];
@@ -362,4 +327,271 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+
+    private void EvaluatePlaystyleAndConfigure() 
+    {
+        var w1 = calibrationWaves[0];
+        var w2 = calibrationWaves[1];
+
+        // AGGREGATE for PI (totals or averages)
+        overallData.totalRoundTime        = w1.waveTime + w2.waveTime;
+        overallData.averageRoundTime      = (w1.waveTime + w2.waveTime) / 2f;
+        overallData.overallAccuracy       = (w1.waveAccuracy + w2.waveAccuracy) / 2f;
+        overallData.totalDistanceTraveled = w1.waveDistanceTraveled + w2.waveDistanceTraveled;
+
+        float PI = ComputeCompositeSkill();
+        Debug.Log("PI:" + PI);
+
+        // SECONDARY METRICS
+        float totalMoving = w1.waveTimeMoving + w2.waveTimeMoving;
+        float totalIdle   = w1.waveTimeIdle   + w2.waveTimeIdle;
+        float moveIdleRatio   = totalIdle > 0f ? totalMoving / totalIdle : 0f;
+        Debug.Log("MvI" + moveIdleRatio);
+
+        float totalDamage = w1.waveDamageTaken + w2.waveDamageTaken;
+        float totalTime   = w1.waveTime + w2.waveTime;
+        float damagePerMin = totalTime > 0f ? totalDamage / totalTime * 60f : 0f;
+        Debug.Log("DPM" + damagePerMin);
+
+        int totalSwitches = w1.waveWeaponSwitches + w2.waveWeaponSwitches;
+        float switchRate  = totalTime > 0f ? totalSwitches / totalTime * 60f : totalSwitches;
+        Debug.Log("SR" + switchRate);
+
+          // HIGH / LOW FLAGS
+        bool highSkill   = PI            >= PI_CUT;
+        bool highMove    = moveIdleRatio >= MVI_CUT;
+        bool highDamage  = damagePerMin  >= DPM_CUT;
+        bool highSwitch  = switchRate    >= SWITCH_CUT;
+
+        // CONFIGURE YOUR INTERVENTIONS
+        ConfigureMoveIdleIntervention(highSkill, highMove);
+        ConfigureDamageIntervention  (highSkill, highDamage);
+        ConfigureSwitchIntervention  (highSkill, highSwitch);
+
+
+        
+    
+}
+
+private float ComputeCompositeSkill()
+{
+    // PCA-derived weights (sum to 1)
+    const float wRT   = 0.315f;  // totalRoundTime
+    const float wAcc  = 0.062f;  // overallAccuracy
+    const float wDist = 0.308f;  // totalDistanceTraveled
+    const float wART  = 0.315f;  // averageRoundTime
+
+    // Pilot means & stddevs (first-two-wave aggregates)
+    const float MEAN_RT   = 77.4362f, STD_RT   = 25.0749f;
+    const float MEAN_ACC  = 0.7958f, STD_ACC  =  0.0790f;
+    const float MEAN_DIST = 205.7390f, STD_DIST = 55.5616f;
+    const float MEAN_ART  = 38.7181f, STD_ART  =  12.5374f;
+
+    // Grab the four aggregated metrics from overallData
+    float rt   = overallData.totalRoundTime;
+    float acc  = overallData.overallAccuracy;
+    float dist = overallData.totalDistanceTraveled;
+    float art  = overallData.averageRoundTime;
+
+    // Compute z-scores
+    float zRT   = (rt   - MEAN_RT)   / STD_RT;
+    float zAcc  = (acc  - MEAN_ACC)  / STD_ACC;
+    float zDist = (dist - MEAN_DIST) / STD_DIST;
+    float zART  = (art  - MEAN_ART)  / STD_ART;
+
+    // Invert the “lower is better” metrics, sum with weights
+    return -wRT  * zRT
+         + wAcc  * zAcc
+         + wDist * zDist
+         - wART * zART;
+}
+
+#region --- Intervention Stubs ---
+/// <summary>
+/// Quadrant I: High Skill × High Move  → Disrupt (spread enemies)
+/// Quadrant II: Low Skill × High Move  → Assist (spawn cover)
+/// Quadrant III: Low Skill × Low Move  → Assist (spawn speed‐boost)
+/// Quadrant IV: High Skill × Low Move  → Disrupt (dart enemies)
+/// </summary>
+private void ConfigureMoveIdleIntervention(bool highSkill, bool highMove)
+{
+    if (highMove && highSkill)
+    {
+        Debug.Log("moving + high skill quadrant hit");
+        StartCoroutine(SpawnCoverSequence());
+    }
+    else if (highMove && !highSkill)
+    {
+        
+        Debug.Log("moving + low skill quadrant hit");
+        // Assist: spawn cover for a low‐skill mover
+        StartCoroutine(SpawnCoverSequence());
+    }
+    else if (!highMove && !highSkill) 
+    {
+        Debug.Log("Idle + low skill quadrant hit");
+        StartCoroutine(SpawnCoverSequence());
+    }
+    else
+    {
+        Debug.Log("Idle + high skill quadrant hit");
+        StartCoroutine(SpawnCoverSequence());
+    } 
+    
+     // (!highMove && highSkill)
+}
+
+/// <summary>
+/// Quadrant I: High Skill × High Damage → Disrupt (slow on hit)
+/// Quadrant II: Low Skill × High Damage → Assist (reduce spawn rate)
+/// Quadrant III: Low Skill × Low Damage → Assist (damage buff pickups)
+/// Quadrant IV: High Skill × Low Damage → Disrupt (spawn mini‐tank)
+/// </summary>
+private void ConfigureDamageIntervention(bool highSkill, bool highDamage)
+{
+    if (highDamage && highSkill) 
+    {
+        Debug.Log("High DT + high skill quadrant hit");
+    }
+    else if (highDamage && !highSkill)
+    {
+        Debug.Log("High DT + low skill quadrant hit");
+    }  // slower spawns
+    else if (!highDamage && !highSkill)
+    {
+        Debug.Log("low DT + low skill quadrant hit");
+    }
+    else Debug.Log("low DT + high skill quadrant hit");
+}
+
+/// <summary>
+/// Quadrant I: High Skill × High Switch → Disrupt (temporary lockout)
+/// Quadrant II: Low Skill × High Switch → Assist (swap bonus)
+/// Quadrant III: Low Skill × Low Switch → Assist (free ammo)
+/// Quadrant IV: High Skill × Low Switch → Disrupt (limit ammo)
+/// </summary>
+private void ConfigureSwitchIntervention(bool highSkill, bool highSwitch)
+{
+    if (highSwitch && highSkill) 
+    {
+        Debug.Log("High SW + high skill quadrant hit");
+    }
+    else if (highSwitch && !highSkill)
+    {
+        Debug.Log("High SW + low skill quadrant hit");
+    }
+    else if (!highSwitch && !highSkill)
+    {
+        Debug.Log("Low SW + low skill quadrant hit");
+    }
+    else Debug.Log("Low SW + high skill quadrant hit");
+    
+}
+#endregion
+
+/// <summary>
+/// Spawns a small cluster of cover crates around the player, one every `interval` seconds.
+/// </summary>
+private IEnumerator SpawnRockCover(int count, float delay = 2.0f)
+{
+    Debug.Log($"[CoverSpawn] rockCoverPrefab is {(rockCoverPrefab==null?"NULL":"OK")}");
+    if (rockCoverPrefab == null) yield break;
+
+    Vector3 playerPos = Player.inst.transform.position;
+    int spawned = 0, attempts = 0;
+
+    while (spawned < count && attempts < count * 5)
+    {
+        attempts++;
+        Debug.Log($"[CoverSpawn] Attempt #{attempts}");
+
+        // 1) pick a random point in a donut
+        float ang  = Random.Range(0f, 2*Mathf.PI);
+        float dist = Random.Range(minSpawnDistance, maxSpawnDistance);
+        Vector3 candidate = playerPos + new Vector3(
+            Mathf.Cos(ang)*dist,
+            0f,
+            Mathf.Sin(ang)*dist
+        );
+        Debug.Log($"  Candidate XZ: {candidate.x:F2}, {candidate.z:F2}");
+
+        // 2) raycast down to ground
+        if (!Physics.Raycast(candidate + Vector3.up*10f,
+                             Vector3.down,
+                             out RaycastHit hit, 
+                             20f))
+        {
+            Debug.Log("   ✗ No ground below");
+            continue;
+        }
+        candidate.y = hit.point.y;
+        Debug.Log($"   ✓ Ground at Y={candidate.y:F2}");
+
+        // 3) overlap‐sphere to see if anything’s in the way
+        Vector3 overlapCenter = candidate + Vector3.up * (checkRadius * 0.5f);
+        Collider[] hits = Physics.OverlapSphere(overlapCenter, checkRadius);
+        bool blocked = false;
+        foreach (var col in hits)
+        {
+            // ignore triggers entirely
+            if (col.isTrigger) 
+            {
+                continue;
+            }
+
+            // ignore the ground by tag
+            if (col.gameObject.CompareTag("Ground"))
+            {
+                Debug.Log("ground");
+                continue;
+            }
+
+            // otherwise it’s a real blocker (player, wall, enemy, etc.)
+            blocked = true;
+            Debug.Log("real blocker");
+            break;
+        }
+        if (blocked)
+        {
+            Debug.Log("No luck");
+            continue;
+        }
+            
+
+        // 4) success! spawn and scale
+        var rock = Instantiate(rockCoverPrefab, candidate, Quaternion.identity);
+        rock.transform.localScale *= rockScaleFactor;
+        Debug.Log("   → Spawned rock cover here");
+        spawned++;
+
+        yield return new WaitForSeconds(delay);
+    }
+
+    if (spawned == 0)
+        Debug.LogWarning("[CoverSpawn] Couldn’t place any cover rocks.");
+    else
+        Debug.Log($"[CoverSpawn] Spawned {spawned}/{count} rocks after {attempts} tries");
+}
+
+/// <summary>
+/// 1) Spawn 4 rocks at t=0 (one every 0.5 s),  
+/// 2) then wait 15 s and spawn 2 rocks (one every 0.5 s),  
+/// 3) repeat that 2-rock refresh three times.
+/// </summary>
+private IEnumerator SpawnCoverSequence()
+{
+    // 1) initial burst of 4
+    yield return SpawnRockCover(4, 2.0f);
+
+    // 2) three refreshes
+    for (int refresh = 0; refresh < 3; refresh++)
+    {
+        yield return new WaitForSeconds(15f);
+        yield return SpawnRockCover(2, 0.5f);
+    }
+}
+
+
+
+
 }

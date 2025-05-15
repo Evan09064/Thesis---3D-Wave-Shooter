@@ -9,7 +9,13 @@ public static class WeaponUsageStats {
     // New dictionary for tracking weapon usage time (in seconds).
     public static Dictionary<string, float> WeaponUsageTimes = new Dictionary<string, float>();
 
+    public static int WeaponSwitchCount;
+
     // Call this method whenever a weapon is used.
+
+    public static void RecordWeaponSwitchCount(){
+        WeaponSwitchCount++ ;
+    }
     public static void RecordWeaponUsage(string weaponName) {
         if (WeaponUsageCounts.ContainsKey(weaponName)) {
             WeaponUsageCounts[weaponName]++;
@@ -22,5 +28,6 @@ public static class WeaponUsageStats {
     public static void ResetWeaponUsage() {
         WeaponUsageCounts.Clear();
         WeaponUsageTimes.Clear();
+        WeaponSwitchCount = 0;
     }
 }

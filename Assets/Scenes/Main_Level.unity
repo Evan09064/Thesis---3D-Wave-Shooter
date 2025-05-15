@@ -378,6 +378,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d80bf4234a57adb4aae05681f61e110f,
         type: 2}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: coverCratePrefab
+      value: 
+      objectReference: {fileID: 1806941789329762, guid: f60a1ea3ae6c8634fad3f3ad2fc08f79,
+        type: 3}
     - target: {fileID: 114663823201920228, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
       propertyPath: refillAmmoCost

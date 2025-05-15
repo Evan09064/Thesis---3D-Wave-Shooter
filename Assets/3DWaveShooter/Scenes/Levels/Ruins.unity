@@ -10567,6 +10567,33 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: d80bf4234a57adb4aae05681f61e110f,
         type: 2}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: rockCoverPrefab
+      value: 
+      objectReference: {fileID: 1347507158547156, guid: d788f1dc2f66d8c4e9f4a7f5b13fc95f,
+        type: 3}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: rockScaleFactor
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: coverCratePrefab
+      value: 
+      objectReference: {fileID: 1347507158547156, guid: d788f1dc2f66d8c4e9f4a7f5b13fc95f,
+        type: 3}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: maxSpawnDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: minSpawnDistance
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114951313500257520, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
       propertyPath: uiAudioSource

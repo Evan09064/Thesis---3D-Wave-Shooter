@@ -126,6 +126,8 @@ public class Enemy : MonoBehaviour
 
         //Sound effect.
         AudioManager.inst.Play(audioSource, AudioManager.inst.enemyDeathSFX[Random.Range(0, AudioManager.inst.enemyDeathSFX.Length)]);
+
+        SinkAndDestroy();
     }
 
     //Temporarily changes a stat for period of time.

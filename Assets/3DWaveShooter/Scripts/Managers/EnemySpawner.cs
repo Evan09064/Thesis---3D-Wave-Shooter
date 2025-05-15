@@ -38,14 +38,6 @@ public class EnemySpawner : MonoBehaviour
         enemiesToSpawn.Clear();
         nextWaveIndex++;
         curEnemyToSpawnIndex = 0;
-
-        //If we have cur enemies from last wave, destroy them.
-        if(curEnemies.Count > 0)
-        {
-            for(int x = 0; x < curEnemies.Count; ++x)
-                curEnemies[x].GetComponent<Enemy>().SinkAndDestroy();
-        }
-
         curEnemies.Clear();
 
         //Start to generate a list of enemies to spawn.
