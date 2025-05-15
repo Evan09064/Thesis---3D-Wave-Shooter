@@ -187,6 +187,7 @@ public class Player : MonoBehaviour
         if(GameManager.inst.waveInProgress)
         {
             WeaponUsageStats.RecordWeaponUsage(weapon.displayName);
+            WeaponUsageStats.RecordWeaponSwitchCount();
         }
 
         //Disable previous weapon visual, and enable the new one.

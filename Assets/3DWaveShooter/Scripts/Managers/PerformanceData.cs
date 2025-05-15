@@ -12,6 +12,7 @@ public class PerformanceDataPerWave {
     public float waveTimeIdle;
     public float waveTimeMoving;
     public float wavePathEfficiency;
+    public int waveWeaponSwitches;
 }
 
 [System.Serializable]
@@ -26,6 +27,7 @@ public class PerformanceDataOverall {
     public float totalTimeIdle;
     public float totalTimeMoving;
     public float pathEfficiency;
+    public int overallWeaponSwitches;
     public int pistolUses;
     public int shotgunUses;
     public int SMGUses;
