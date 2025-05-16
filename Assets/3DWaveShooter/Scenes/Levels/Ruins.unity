@@ -7744,7 +7744,7 @@ GameObject:
   - component: {fileID: 1311414677}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -10576,7 +10576,7 @@ PrefabInstance:
     - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
       propertyPath: rockScaleFactor
-      value: 0.7
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
