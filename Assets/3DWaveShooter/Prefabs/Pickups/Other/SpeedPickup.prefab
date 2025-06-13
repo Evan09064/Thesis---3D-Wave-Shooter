@@ -99,7 +99,7 @@ MonoBehaviour:
     purchaseCost: 0
     upgrades: []
     nextUpgradeIndex: 0
-  speedMultiplier: 1.75
+  speedMultiplier: 1.6
   boostDuration: 10
   damageMultiplier: 0
   duration: 0

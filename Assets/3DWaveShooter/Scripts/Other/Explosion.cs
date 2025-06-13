@@ -62,7 +62,7 @@ public class Explosion : MonoBehaviour
             //Add explosive force to the rigidbody.
             if(rig)
             {
-                rig.AddExplosionForce(data.explosiveForce, source + (Vector3.one * Random.Range(-1.0f, 1.0f)), data.explosiveRange, 0.1f, ForceMode.Impulse);
+                rig.AddExplosionForce(data.explosiveForce,source,data.explosiveRange,0f,ForceMode.Impulse);
             }
         }
 

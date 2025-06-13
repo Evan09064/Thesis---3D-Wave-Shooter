@@ -112,8 +112,9 @@ public class ShopUI : MonoBehaviour
         shopScreen.SetActive(open);
         Player.inst.canAttack = !open;
         Player.inst.canMove = !open;
+        GameUI.inst.openShopButton.SetActive(!open);
 
-        if(open)
+        if (open)
         {
             UpdateWeaponButtons();
             UpdateShop();

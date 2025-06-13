@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;        
-using System.Linq;     
+using System.Linq;
 using URandom = UnityEngine.Random;
-
-
+using UnityEngine.Networking;
+using UnityEngine.UI;
+using TMPro;
 
 
 /// <summary>
@@ -142,12 +143,11 @@ public class GameManager : MonoBehaviour
     public float desiredSeparation = 2.5f;         // ideal minimum distance between enemies
     [Tooltip("Strength of the repulsion force.")]
     public float antiSocialCoefficient = 1.0f;     // multiplier for repulsion
-
-
-
-
-    // GameManager.cs
     private HashSet<string> swapBonusGrantedFor = new HashSet<string>();
+    private bool isPaused = false;
+
+    [Header("Pause")]
+    public Text pauseGameText;
 
 
     private PerformanceDataPerWave BuildWaveData(int waveNum)
@@ -166,16 +166,16 @@ public class GameManager : MonoBehaviour
         int currentSwitchCount = WeaponUsageStats.WeaponSwitchCount;
         int waveSwitchCount = currentSwitchCount - prevWeaponSwitchCount;
 
-        var waveUsageCounts = new Dictionary<string,int>();
+        var waveUsageCounts = new Dictionary<string, int>();
         foreach (var kv in WeaponUsageStats.WeaponUsageCounts)
             waveUsageCounts[kv.Key] = kv.Value - (prevUsageCounts.ContainsKey(kv.Key) ? prevUsageCounts[kv.Key] : 0);
 
-        var waveUsageTimes = new Dictionary<string,float>();
+        var waveUsageTimes = new Dictionary<string, float>();
         foreach (var kv in WeaponUsageStats.WeaponUsageTimes)
             waveUsageTimes[kv.Key] = kv.Value - (prevUsageTimes.ContainsKey(kv.Key) ? prevUsageTimes[kv.Key] : 0f);
 
-        var timeArray  = waveUsageTimes
-            .Select(kv => new WeaponTime  { weaponName = kv.Key, secondsEquipped = kv.Value })
+        var timeArray = waveUsageTimes
+            .Select(kv => new WeaponTime { weaponName = kv.Key, secondsEquipped = kv.Value })
             .ToArray();
 
         // update the “prev” trackers
@@ -183,8 +183,8 @@ public class GameManager : MonoBehaviour
         prevTimeMoving = currentTimeMoving;
         prevTimeIdle = currentTimeIdle;
         prevWeaponSwitchCount = currentSwitchCount;
-        prevUsageCounts = new Dictionary<string,int>(WeaponUsageStats.WeaponUsageCounts);
-        prevUsageTimes  = new Dictionary<string,float>(WeaponUsageStats.WeaponUsageTimes);
+        prevUsageCounts = new Dictionary<string, int>(WeaponUsageStats.WeaponUsageCounts);
+        prevUsageTimes = new Dictionary<string, float>(WeaponUsageStats.WeaponUsageTimes);
 
         // build and return
         return new PerformanceDataPerWave
@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour
             waveTimeIdle = waveTimeIdle,
             waveTimeMoving = waveTimeMoving,
             waveWeaponSwitches = waveSwitchCount,
-            waveWeaponUsageTimes   = timeArray
+            waveWeaponUsageTimes = timeArray
         };
     }
 
@@ -214,16 +214,31 @@ public class GameManager : MonoBehaviour
         StartGame();
     }
 
-    void Update()
-    {
-        if (waveInProgress)
-            curWaveTime += Time.deltaTime;
+   void Update() {
+      if (Input.GetKeyDown(KeyCode.C)) {
+        TogglePause();
+      }
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            damagePickupRoutine = StartCoroutine(DamagePickupSpawner());
-            speedBoostRoutine = StartCoroutine(SpeedBoostSpawner());
-        }
+      if (!isPaused && waveInProgress) {
+        curWaveTime += Time.deltaTime;
+      }
+    }
+
+    private void TogglePause() {
+      isPaused = !isPaused;
+
+      // freeze or unfreeze everything that uses Time.deltaTime
+      Time.timeScale = isPaused ? 0f : 1f;
+
+      // show or hide your pause UI
+      pauseGameText.gameObject.SetActive(isPaused);
+
+      // (optional) disable player input when paused
+      Player.inst.canMove = !isPaused;
+      Player.inst.canSwap = !isPaused;  // whatever flags control your shooting
+      Player.inst.canAttack = !isPaused;
+        // if you had an “openShopButton” being shown on C, hide it when paused
+        GameUI.inst.openShopButton.SetActive(false);
     }
 
     //Called when the game starts.
@@ -252,6 +267,7 @@ public class GameManager : MonoBehaviour
         prevTimeMoving = 0f;
         prevTimeIdle = 0f;
         SetNextWave();
+        GameUI.inst.openShopButton.SetActive(false);
     }
 
     //Called to start spawning the next wave.
@@ -273,6 +289,7 @@ public class GameManager : MonoBehaviour
         Player.inst.currentWeaponEquipTime = Time.time;
         gameIsActive = true;
         waveInProgress = true;
+        GameUI.inst.openShopButton.SetActive(false);
 
         //Same with ammo for all weapons.
         if (refillAmmoOnNewWave)
@@ -305,6 +322,10 @@ public class GameManager : MonoBehaviour
         PerformanceStats.EndWave();   // finishes timing + increments CompletedWaves
         CleanupCoverRocks();
 
+        var allPickups = FindObjectsByType<Pickup>(FindObjectsSortMode.None);
+        foreach (var pickup in allPickups)
+            Destroy(pickup.gameObject);
+
         // 1) build the wave object
         var waveData = BuildWaveData(waveCount);
         overallData.waveMetrics.Add(waveData);
@@ -336,6 +357,22 @@ public class GameManager : MonoBehaviour
             waveCount++;
         }
     }
+    
+    IEnumerator SendMetricsToServer(string json)
+    {
+        var url = "https://<your-project>.glitch.me/collect-metrics";
+        using var req = new UnityWebRequest(url, "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        req.uploadHandler   = new UploadHandlerRaw(bodyRaw);
+        req.downloadHandler = new DownloadHandlerBuffer();
+        req.SetRequestHeader("Content-Type", "application/json");
+
+        yield return req.SendWebRequest();
+        if (req.result != UnityWebRequest.Result.Success)
+            Debug.LogError($"Metrics POST failed: {req.error}");
+        else
+            Debug.Log("Metrics successfully sent!");
+    }
 
     //Called when all waves have been killed off.
     public void WinGame()
@@ -343,7 +380,7 @@ public class GameManager : MonoBehaviour
         gameIsActive = false;
         waveInProgress = false;
 
-            //Logging all performance metrics
+        //Logging all performance metrics
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
         overallData.totalRoundTime = PerformanceStats.OverallWaveTime;
         overallData.averageRoundTime = PerformanceStats.AverageWaveCompletionTime;
@@ -355,8 +392,8 @@ public class GameManager : MonoBehaviour
         overallData.totalTimeMoving = Player.inst.movement.totalTimeMoving;
         overallData.totalTimeIdle = Player.inst.movement.totalTimeIdle;
         overallData.overallWeaponSwitches = WeaponUsageStats.WeaponSwitchCount;
-        overallData.totalWeaponUsageTimes  = WeaponUsageStats.WeaponUsageTimes
-            .Select(kv => new WeaponTime  { weaponName = kv.Key, secondsEquipped = kv.Value })
+        overallData.totalWeaponUsageTimes = WeaponUsageStats.WeaponUsageTimes
+            .Select(kv => new WeaponTime { weaponName = kv.Key, secondsEquipped = kv.Value })
             .ToArray();
 
 
@@ -365,6 +402,8 @@ public class GameManager : MonoBehaviour
         string filePath = System.IO.Path.Combine(Application.persistentDataPath, "PerformanceData.json");
         System.IO.File.WriteAllText(filePath, json);
         Debug.Log("Performance data saved to: " + filePath);
+
+        StartCoroutine(SendMetricsToServer(json));
 
         // Reset weapon usage stats.
         WeaponUsageStats.ResetWeaponUsage();
