@@ -275,6 +275,7 @@ public class GameManager : MonoBehaviour
     {
         ShopUI.inst.
         ToggleShop(false);
+        GameUI.inst.openShopButton.SetActive(false);
         curWaveTime = 0.0f;
         curWave = EnemySpawner.inst.nextWaveIndex + 1;
         Player.inst.canMove = false;
@@ -379,6 +380,7 @@ public class GameManager : MonoBehaviour
     {
         gameIsActive = false;
         waveInProgress = false;
+        GameUI.inst.openShopButton.SetActive(false);
 
         //Logging all performance metrics
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
