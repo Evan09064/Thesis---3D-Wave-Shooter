@@ -22,6 +22,18 @@ public class Pickup : MonoBehaviour
 
     private float creationTime;                     //Used to make sure the player doesn't instantly pick their weapon up again after dropping it.
     
+    [Header("Speed Boost")]
+    [Tooltip("How much to multiply the player's speed by.")]
+    public float speedMultiplier = 1.60f;
+    [Tooltip("How long the speed boost lasts (seconds).")]
+    public float boostDuration   = 5f;
+
+    [Header("Damage Boost")]
+    [Tooltip("Multiplier to apply to player damage")]
+    public float damageMultiplier = 1.75f;
+    [Tooltip("How long the buff lasts (seconds)")]
+    public float duration = 10f;
+
     void OnEnable ()
     {
         creationTime = Time.time;
@@ -40,44 +52,59 @@ public class Pickup : MonoBehaviour
         weaponToGive = weapon;
     }
 
-    void OnTriggerEnter (Collider col)
+    void OnTriggerEnter(Collider col)
     {
-        if(Time.time - creationTime < 0.2f)
-            return;
+        if (Time.time - creationTime < 0.2f) return;
 
-        if(col.tag == "Player")
+        if (col.CompareTag("Player"))
         {
-            if(type == PickupType.Health)
+            switch (type)
             {
-                Player.inst.AddHealth(healthToGive);
-                Destroy(gameObject);
-            }
-            else if(type == PickupType.Weapon)
-            {
-                Player.inst.GiveWeapon(weaponToGive);
-                Destroy(gameObject);
-            }
-            else if(type == PickupType.Ammo)
-            {
-                if(spreadAmmoAcrossAllWeapons)
-                {
-                    for(int x = 0; x < Player.inst.weapons.Count; ++x)
+                case PickupType.Ammo:
+                    if (spreadAmmoAcrossAllWeapons)
                     {
-                        Player.inst.GiveAmmo(Player.inst.weapons[x].id, Mathf.FloorToInt((float)ammoToGive / Player.inst.weapons.Count));
+                        int perWeapon = Mathf.FloorToInt((float)ammoToGive / Player.inst.weapons.Count);
+                        foreach (var w in Player.inst.weapons)
+                            Player.inst.GiveAmmo(w.id, perWeapon);
                     }
-                }
-                else
-                    Player.inst.GiveAmmo(Player.inst.curWeapon.id, ammoToGive);
+                    else
+                    {
+                        Player.inst.GiveAmmo(Player.inst.curWeapon.id, ammoToGive);
+                    }
+                    Destroy(gameObject);
+                    break;
 
-                Destroy(gameObject);
+                case PickupType.Weapon:
+                    Player.inst.GiveWeapon(weaponToGive);
+                    Destroy(gameObject);
+                    break;
+
+                case PickupType.SpeedBoost:
+                    // Apply the speed boost on the player
+                    Player.inst.ApplySpeedBoost(speedMultiplier, boostDuration);
+                    Destroy(gameObject);
+                    break;
+
+                case PickupType.DamageBoost:
+                    var atk = col.GetComponent<PlayerAttack>();
+                    if (atk != null)
+                    {
+                        atk.ApplyDamageBuff(damageMultiplier, duration);
+                    }
+                    Destroy(gameObject);
+                    break;
+
             }
         }
-    }
+    }    
 }
 
 public enum PickupType
 {
     Health,
     Weapon,
-    Ammo
+    Ammo,
+    SpeedBoost,
+    DamageBoost
+
 }

@@ -47,8 +47,6 @@ public class Projectile : MonoBehaviour
             {
                 if(!rocketAccuracyRegistered)
                 {
-                    PerformanceStats.RoundShotsHit++;
-                    PerformanceStats.OverallShotsHit++;
                     rocketAccuracyRegistered = true;
                 }
                 // Pass 'false' so that this damage call doesn't add accuracy again.
@@ -95,6 +93,8 @@ public class Projectile : MonoBehaviour
     //Sets the required values of the projectile to this script.
     public void SetValues (ProjectileScriptableObject data)
     {
+        rocketAccuracyRegistered = false;
+        
         damage = data.damage;
         destroyTime = Time.time + data.destroyTime;
         knockback = Player.inst.curWeapon.enemyKnockback;

@@ -24,6 +24,10 @@ public class PlayerMovement : MonoBehaviour
     // To track movement frame-to-frame.
     private Vector3 lastPosition;
 
+    [Header("Speed Modifiers")]
+    public float speedMultiplier = 1f;
+
+
     void Awake ()
     {
         //Get missing components
@@ -88,33 +92,30 @@ public class PlayerMovement : MonoBehaviour
         Vector3 dir = (camForward * y) + (camRight * x);
 
         //Update player state.
-        if(Player.inst.state != PlayerState.Dead)
+       
+        if(dir.magnitude > 0)
         {
-            if(dir.magnitude > 0)
-            {
-                totalTimeMoving += Time.deltaTime;
+            totalTimeMoving += Time.deltaTime;
 
-                if(Player.inst.state != PlayerState.Moving)
-                {
-                    Player.inst.state = PlayerState.Moving;
-                    Player.inst.anim.SetBool("Moving", true);
-                }
-            }
-            else
+            if(Player.inst.state != PlayerState.Moving)
             {
-                totalTimeIdle += Time.deltaTime;
-
-                if(Player.inst.state != PlayerState.Idle)
-                {
-                    Player.inst.state = PlayerState.Idle;
-                    Player.inst.anim.SetBool("Moving", false);
-                    totalTimeIdle += Time.deltaTime;
-                }
+                Player.inst.state = PlayerState.Moving;
+                Player.inst.anim.SetBool("Moving", true);
             }
         }
+        else
+        {
+            totalTimeIdle += Time.deltaTime;
 
+            if(Player.inst.state != PlayerState.Idle)
+            {
+                Player.inst.state = PlayerState.Idle;
+                Player.inst.anim.SetBool("Moving", false);
+            }
+        }
+        
         //Finally set that as the player's velocity, also including the player's move speed.
-        rig.linearVelocity = dir * Player.inst.moveSpeed;
+        rig.linearVelocity = dir * Player.inst.moveSpeed * speedMultiplier;
     
         // ===== Movement Metrics Tracking (MY CODE) =====
 

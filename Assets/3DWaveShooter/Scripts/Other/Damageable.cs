@@ -24,7 +24,7 @@ public class Damageable : MonoBehaviour
 
         if(explosive)
         {
-            Explosion.Explode(explosiveData, transform.position);
+            Explosion.Explode(explosiveData, transform.position, false);
         }
 
         if(destroySFX)

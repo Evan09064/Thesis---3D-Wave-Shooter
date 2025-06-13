@@ -9,8 +9,6 @@ public class Player : MonoBehaviour
 {
     [Header("Stats")]
     public PlayerState state;                       //Current state of the player.
-    public int curHp;                               //Player's current health (CAN change when playing).
-    public int maxHp;                               //Player's maximum health (CAN NOT change when playing).
     public float moveSpeed;                         //Player's move speed in units per second.
     public int money;                               //Player's current money.
 
@@ -25,6 +23,10 @@ public class Player : MonoBehaviour
     public bool canMove;                            //Is the player able to move?
     public bool canAttack;                          //Is the player able to use their weapon/s?
 
+    [Header("Swap Control")]
+    public bool canSwap = true;    // whether the player is allowed to scroll‐switch weapons
+
+
     [Header("Components")]
     public GameObject weaponPos;                    //Position the player will hold their weapon at.
     public PlayerMovement movement;                 //Player's PlayerMovement component.
@@ -33,7 +35,8 @@ public class Player : MonoBehaviour
     public Animator anim;                           //Player's Animator component.
     public MeshSetter meshSetter;                   //Player's MeshSetter.cs component.
     public float currentWeaponEquipTime;
-    public bool isDead = false;
+    
+    private Coroutine _boostCoroutine = null;
 
 
     //Instance
@@ -78,21 +81,26 @@ public class Player : MonoBehaviour
     }
 
     //Called when the player takes damage. From enemies or any other source in the world.
-    public void TakeDamage (int damage)
+    public void TakeDamage(int damage)
     {
         // Update damage counters.
         PerformanceStats.OverallDamageTaken += damage;
         PerformanceStats.RoundDamageTaken += damage;
-        
+
         //Instead of losing health, Player will lose 10 units of money 
-        money -= 10;
+        if (GameManager.inst.waveCount == 1 || GameManager.inst.waveCount == 2 || GameManager.inst.waveCount == 3)
+        {
+            money -= 10;
+        }
+        else if (GameManager.inst.waveCount == 4 || GameManager.inst.waveCount == 5)
+        {
+            money -= 30;
+        }
         if (money < 0) money = 0;
 
         //Sound effect.
         AudioManager.inst.Play(audioSource, AudioManager.inst.playerImpactSFX[Random.Range(0, AudioManager.inst.playerImpactSFX.Length)]);
 
-        //Update UI.
-        GameUI.inst.UpdateHealthBar();
         // GameUI.inst.UpdateMoneyText();
 
         //Cam Shake
@@ -100,30 +108,17 @@ public class Player : MonoBehaviour
 
         //Visual color change.
         StartCoroutine(DamageVisualFlash());
+        
+        // … your existing money‐loss, shake, flash …
+        if (GameManager.inst.damageDisruptEnabled)
+        {
+            GameManager.inst.TriggerDamageDisrupt();
+        }
+
     }
 
-    //Called when the player's health reaches 0. Kills them. Game over.
-    public void Die ()
-    {
-        if (isDead)
-            return;
-        isDead = true;
-        curHp = 0;
-        canMove = false;
-        canAttack = false;
-        state = PlayerState.Dead;
-        anim.SetTrigger("Die");
-        GameManager.inst.LoseGame();
-    }
 
     //Adds to the player's current health.
-    public void AddHealth (int amount)
-    {
-        curHp += amount;
-
-        if(curHp > maxHp)
-            curHp = maxHp;
-    }
 
     //Called for the player to receive a new weapon.
     public void GiveWeapon (Weapon weapon)
@@ -154,11 +149,31 @@ public class Player : MonoBehaviour
         EquipWeapon(weapon);
     }
 
+    /// <summary>
+/// Returns true if _every_ weapon has 0 in-clip AND 0 in reserve.
+/// </summary>
+    /// <summary>
+/// Returns true if _every_ weapon has no rounds in the clip AND no reserve ammo.
+/// </summary>
+    public bool AreAllGunsEmpty()
+    {
+        foreach (var w in weapons)
+        {
+            // w.curAmmoInClip == bullets currently loaded
+            // w.curAmmo       == bullets in reserve
+            if (w.curAmmoInClip > 0 || w.curAmmo > 0)
+                return false;
+        }
+        return true;
+    }
+
+
+
     //Tries to equip a weapon in arsenal.
     //dir is the direction of change (1 = next, -1 = last).
     void TryChangeWeapon (int dir)
     {
-        if (!GameManager.inst.waveInProgress)
+        if (!GameManager.inst.waveInProgress || !canSwap)
             return;
 
         int nextIndex = weapons.IndexOf(curWeapon) + dir;
@@ -184,11 +199,11 @@ public class Player : MonoBehaviour
         Weapon prevWeapon = curWeapon;
         curWeapon = weapon;
 
-        if(GameManager.inst.waveInProgress)
-        {
-            WeaponUsageStats.RecordWeaponUsage(weapon.displayName);
-            WeaponUsageStats.RecordWeaponSwitchCount();
-        }
+       
+        WeaponUsageStats.RecordWeaponUsage(weapon.displayName);
+        WeaponUsageStats.RecordWeaponSwitchCount();
+        GameManager.inst.OnWeaponSwapped(weapon.displayName);
+ 
 
         //Disable previous weapon visual, and enable the new one.
         if(prevWeapon != null)
@@ -259,6 +274,33 @@ public class Player : MonoBehaviour
         weapon.curAmmoInClip = weapon.clipSize;
     }
 
+    public void ApplySpeedBoost(float multiplier, float duration = 10f)
+    {
+        // 1) First-time boost: actually increase the speed
+        if (_boostCoroutine == null)
+        {
+            movement.speedMultiplier *= multiplier;
+        }
+        // 2) If there is already a boost running, stop its timer
+        else
+        {
+            StopCoroutine(_boostCoroutine);
+        }
+        // 3) Start (or restart) the timer
+        _boostCoroutine = StartCoroutine(SpeedBoostCoroutine(multiplier, duration));
+    }
+
+    private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        // Revert the speed and clear the coroutine handle
+        movement.speedMultiplier /= multiplier;
+        _boostCoroutine = null;
+    }
+
+
+
     //Visually flashes the player red when damaged.
     IEnumerator DamageVisualFlash ()
     {
@@ -274,6 +316,5 @@ public class Player : MonoBehaviour
 public enum PlayerState
 {
     Idle,
-    Moving,
-    Dead
+    Moving
 }

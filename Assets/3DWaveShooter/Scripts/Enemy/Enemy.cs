@@ -63,10 +63,29 @@ public class Enemy : MonoBehaviour
     //Called when the enemy gets damaged from any source in the world.
     public void TakeDamage (int damage, bool countAccuracy = true)
     {
-        if(countAccuracy)
+        var curWeapon = Player.inst?.curWeapon;
+        bool isFlame = (curWeapon != null && curWeapon.displayName == "Flamethrower");
+        bool isShotgun = (curWeapon != null && curWeapon.displayName == "Shotgun");
+        if (countAccuracy && !isFlame)
         {
-            PerformanceStats.RoundShotsHit++;
-            PerformanceStats.OverallShotsHit++;
+             if (isShotgun)
+             {
+                if (!PerformanceStats.shotgunHitCountedThisClick)
+                {
+                    PerformanceStats.shotgunHitCountedThisClick = true;
+                    PerformanceStats.RoundShotsHit++;
+                    PerformanceStats.OverallShotsHit++;
+                    Debug.Log($"[DEBUG] Shotgun shot hit → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
+                }
+             // else: we’ve already counted this click’s hit, so do nothing here
+             }
+            else
+            {
+                // All non‐shotgun weapons just auto‐count normally:
+                PerformanceStats.RoundShotsHit++;
+                PerformanceStats.OverallShotsHit++;
+                Debug.Log($"[DEBUG] Shot hit (weapon = {curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
+            }
         }
 
         if(curHp - damage > 0)
@@ -85,10 +104,30 @@ public class Enemy : MonoBehaviour
     //Called when the enemy gets damaged from any source in the world.
     public void TakeDamage (int damage, Vector3 impactPos, Vector3 forward, bool countAccuracy = true)
     {
-        if(countAccuracy)
+        var curWeapon = Player.inst?.curWeapon;
+        bool isFlame = (curWeapon != null && curWeapon.displayName == "Flamethrower");
+        bool isShotgun = (curWeapon != null && curWeapon.displayName == "Shotgun");
+
+        if (countAccuracy && !isFlame)
         {
-            PerformanceStats.RoundShotsHit++;
-            PerformanceStats.OverallShotsHit++;
+            if (isShotgun)
+            {
+                if (!PerformanceStats.shotgunHitCountedThisClick)
+                {
+                    PerformanceStats.shotgunHitCountedThisClick = true;
+                    PerformanceStats.RoundShotsHit++;
+                    PerformanceStats.OverallShotsHit++;
+                    Debug.Log($"[DEBUG] Shotgun shot hit → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
+                }
+            // else: we’ve already counted this click’s hit, so do nothing here
+            }
+            else
+            {
+                // All non‐shotgun weapons just auto‐count normally:
+                PerformanceStats.RoundShotsHit++;
+                PerformanceStats.OverallShotsHit++;
+                Debug.Log($"[DEBUG] Shot hit (weapon = {curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
+            }
         }
 
         if(curHp - damage > 0)

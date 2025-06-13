@@ -31,13 +31,5 @@ MonoBehaviour:
   offsets:
     positionOffset: {x: 0, y: 0.1, z: 0}
     rotationOffset: {x: 0, y: 0, z: 0}
-  purchaseCost: 650
-  upgrades:
-  - cost: 500
-    reloadTime: 1
-    shootFrequency: 0
-    accuracy: 0
-    burstAmount: 0
-    clipSize: 150
-    playerKnockback: 0
-    enemyKnockback: 0
+  purchaseCost: 800
+  upgrades: []

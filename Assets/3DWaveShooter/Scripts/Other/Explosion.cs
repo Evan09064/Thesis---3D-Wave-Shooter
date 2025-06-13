@@ -12,12 +12,12 @@ public class Explosion : MonoBehaviour
     void Awake () { inst = this; }
 
     //Global explosion function used by every thing that explodes.
-    public static void Explode (ExplosiveOptions data, Vector3 source)
+    public static void Explode (ExplosiveOptions data, Vector3 source, bool countAccuracy)
     {
-        Explosion.inst.StartCoroutine(Explosion.inst.ExplodeTimer(data, source));
+        Explosion.inst.StartCoroutine(Explosion.inst.ExplodeTimer(data, source, countAccuracy));
     }
 
-    public IEnumerator ExplodeTimer (ExplosiveOptions data, Vector3 source)
+    public IEnumerator ExplodeTimer (ExplosiveOptions data, Vector3 source, bool countAccuracy)
     {
         yield return new WaitForSeconds(0.05f);
         
@@ -33,12 +33,14 @@ public class Explosion : MonoBehaviour
                 break;
             }
         }
-        
+
         // For rocket launcher explosions, we want to count one accurate hit if any enemy is affected.
-        if (hitAtLeastOneEnemy)
+        if (hitAtLeastOneEnemy && countAccuracy)
         {
             PerformanceStats.RoundShotsHit++;
             PerformanceStats.OverallShotsHit++;
+            Debug.Log($"[DEBUG] Shot hit (weapon = {Player.inst.curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
+           
         }
 
         //Loop through them all.

@@ -24,7 +24,7 @@ MonoBehaviour:
       amountToSpawn: 6
     - enemy: {fileID: 1426315452375196, guid: 30d53a1a02c93fa409850d1f51e83fa2, type: 3}
       amountToSpawn: 4
-    enemySpawnRate: 3
+    enemySpawnRate: 4.5
     boss:
       spawnBoss: 0
       boss: {fileID: 0}
@@ -49,6 +49,30 @@ MonoBehaviour:
     - enemy: {fileID: 1426315452375196, guid: 30d53a1a02c93fa409850d1f51e83fa2, type: 3}
       amountToSpawn: 5
     enemySpawnRate: 2.07
+    boss:
+      spawnBoss: 0
+      boss: {fileID: 0}
+      wavePercentToSpawnBoss: 0
+  - enemyTypes:
+    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 3}
+      amountToSpawn: 10
+    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 3}
+      amountToSpawn: 8
+    - enemy: {fileID: 1426315452375196, guid: 30d53a1a02c93fa409850d1f51e83fa2, type: 3}
+      amountToSpawn: 6
+    enemySpawnRate: 1.625
+    boss:
+      spawnBoss: 0
+      boss: {fileID: 0}
+      wavePercentToSpawnBoss: 0
+  - enemyTypes:
+    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 3}
+      amountToSpawn: 10
+    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 3}
+      amountToSpawn: 8
+    - enemy: {fileID: 1426315452375196, guid: 30d53a1a02c93fa409850d1f51e83fa2, type: 3}
+      amountToSpawn: 6
+    enemySpawnRate: 1.453
     boss:
       spawnBoss: 0
       boss: {fileID: 0}

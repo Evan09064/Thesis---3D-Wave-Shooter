@@ -14,10 +14,7 @@ public class ShopUI : MonoBehaviour
     public Color purchaseColor;
 
     [Header("Shop Buttons")]
-    public Text refillHealthText;
     public Text refillAmmoText;
-    public Text increaseSpeedText;
-    public Image increaseSpeedProgressBar;
 
     [Header("Text")]
     public Text playerMoneyText;
@@ -174,17 +171,7 @@ public class ShopUI : MonoBehaviour
         playerMoneyText.text = "$" + Player.inst.money;
 
         //Refill Health and Ammo
-        refillHealthText.text = "$" + ShopData.inst.refillHealthCost;
         refillAmmoText.text = "$" + ShopData.inst.refillAmmoCost;
-
-        //Move Speed Upgrade
-        if(ShopData.inst.moveSpeedUpgrade.canUpgrade)
-            increaseSpeedText.text = "$" + ShopData.inst.moveSpeedUpgrade.curPrice;
-        else
-            increaseSpeedText.text = "MAX";
-
-        float rate = 1.0f / (float)(ShopData.inst.moveSpeedUpgrade.maxUpgrades);
-        increaseSpeedProgressBar.fillAmount = rate * ShopData.inst.moveSpeedUpgrade.upgradesDone;
     }
 
     //Called when a weapon's "Purchase" button is pressed.
@@ -228,20 +215,6 @@ public class ShopUI : MonoBehaviour
     }
 
     //Called when the "Refill Health" button is pressed.
-    public void OnRefillHealthButton ()
-    {
-        //Does the player have enough money to refill?
-        if(Player.inst.money >= ShopData.inst.refillHealthCost)
-        {
-            //Is so, take the money and refill health.
-            Player.inst.RemoveMoney(ShopData.inst.refillHealthCost);
-            Player.inst.curHp = Player.inst.maxHp;
-
-            //Update shop.
-            UpdateWeaponButtons();
-            UpdateShop();
-        }
-    }
 
     //Called when the "Refill Ammo" button is pressed.
     public void OnRefillAmmoButton ()
@@ -262,27 +235,4 @@ public class ShopUI : MonoBehaviour
     }
 
     //Called when the "Increase Speed" button is pressed.
-    public void OnUpgradeMoveSpeedButton ()
-    {
-        //Does the player have enough money to upgrade move speed?
-        if(Player.inst.money >= ShopData.inst.moveSpeedUpgrade.curPrice && ShopData.inst.moveSpeedUpgrade.canUpgrade)
-        {
-            ShopStatUpgrade upgrade = ShopData.inst.moveSpeedUpgrade;
-
-            Player.inst.RemoveMoney(upgrade.curPrice);
-
-            Player.inst.moveSpeed *= upgrade.statIncreaseModifier;
-
-            upgrade.curPrice = Mathf.CeilToInt((float)upgrade.curPrice * upgrade.priceIncreaseRate);
-
-            upgrade.upgradesDone++;
-
-            if(upgrade.upgradesDone == upgrade.maxUpgrades)
-                upgrade.canUpgrade = false;
-
-            //Update shop.
-            UpdateWeaponButtons();
-            UpdateShop();
-        }
-    }
 }

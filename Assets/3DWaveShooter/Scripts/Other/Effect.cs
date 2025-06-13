@@ -73,7 +73,7 @@ public class Effect : MonoBehaviour
     //Explosive
     void Explode ()
     {
-        Explosion.Explode(explosiveOptions, hitEntity.transform.position);
+        Explosion.Explode(explosiveOptions, hitEntity.transform.position, true);
     }
 
     //Temporarily change hit entity's stat.

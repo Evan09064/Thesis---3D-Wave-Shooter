@@ -96,30 +96,89 @@ public class EnemyAI : MonoBehaviour
     }
 
     //Moves the enemy towards the target.
-    void Move ()
+    void Move()
     {
-        //Do we have a path we can follow?
-        if(path.Count > 0)
+        // Do we have a path we can follow?
+        if (path.Count > 0)
         {
-            //If we're right next to the path point, remove it.
-            if(Vector3.Distance(transform.position, path[0]) < 1)
+            // If we're right next to the path point, remove it.
+            if (Vector3.Distance(transform.position, path[0]) < 1)
                 path.RemoveAt(0);
 
-            //No path yet? Return.
-            if(path.Count == 0)
+            // No path yet? Return.
+            if (path.Count == 0)
                 return;
 
-            //Set out target pos to be the closest path point.
+            // Determine the “chase target” position:
             Vector3 targetPos = path[0];
-
-            //If we only have 1 point in the path, just set the target pos to be the player.
-            if(path.Count == 1)
+            if (path.Count == 1)
                 targetPos = target.transform.position;
 
-            transform.position += transform.forward * enemy.moveSpeed * Time.deltaTime;
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(transform.rotation.x, GetRotationToPosition(targetPos), transform.rotation.z), 10 * Time.deltaTime);
+            // If spread-mode is OFF, use the existing simple chase:
+            if (!GameManager.inst.spreadEnemiesEnabled)
+            {
+                // ——— Original chase code ———
+                transform.position += transform.forward * enemy.moveSpeed * Time.deltaTime;
+                transform.rotation = Quaternion.Lerp(
+                    transform.rotation,
+                    Quaternion.Euler(transform.rotation.x, GetRotationToPosition(targetPos), transform.rotation.z),
+                    10 * Time.deltaTime
+                );
+            }
+            // If spread-mode is ON, compute a separation vector + chase vector:
+            else
+            {
+                // 1) Compute direction toward the chase target:
+                Vector3 toTarget = (targetPos - transform.position).normalized;
+
+                // 2) Compute a repulsion vector from any nearby enemies:
+                Vector3 separation = Vector3.zero;
+                // Find all colliders within 'separationRadius'
+                Collider[] hits = Physics.OverlapSphere(transform.position, GameManager.inst.separationRadius);
+                foreach (var col in hits)
+                {
+                    // We only care about other enemies—assume each enemy GameObject has tag "Enemy":
+                    if (col.gameObject == this.gameObject) 
+                        continue; // skip self
+                    if (!col.CompareTag("Enemy")) 
+                        continue; // skip anything that's not an enemy
+
+                    // Direction away from that neighbor:
+                    Vector3 diff = transform.position - col.transform.position;
+                    float d = diff.magnitude;
+                    if (d < Mathf.Epsilon) 
+                        continue; // avoid divide-by-zero
+
+                    // If they're too close (< desiredSeparation), push away:
+                    if (d < GameManager.inst.desiredSeparation)
+                    {
+                        // A simple linear repulsion: (desiredSeparation - d)
+                        Vector3 push = diff.normalized * (GameManager.inst.desiredSeparation - d);
+                        separation += push;
+                    }
+                }
+
+                // 3) Normalize and scale the separation vector:
+                if (separation != Vector3.zero)
+                {
+                    separation = separation.normalized * GameManager.inst.antiSocialCoefficient;
+                }
+
+                // 4) Combine chase + separation, then move & rotate:
+                Vector3 moveDir = (toTarget + separation).normalized;
+                transform.position += moveDir * enemy.moveSpeed * Time.deltaTime;
+
+                // Rotate to face moveDir:
+                float desiredYAngle = Mathf.Atan2(moveDir.x, moveDir.z) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Lerp(
+                    transform.rotation,
+                    Quaternion.Euler(transform.rotation.x, desiredYAngle, transform.rotation.z),
+                    10 * Time.deltaTime
+                );
+            }
         }
     }
+
 
     //Generates a new path from the enemy to the target by using NavMesh.
     void GenerateNewPath ()
