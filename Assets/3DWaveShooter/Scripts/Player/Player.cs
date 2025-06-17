@@ -304,12 +304,7 @@ public class Player : MonoBehaviour
     //Visually flashes the player red when damaged.
     IEnumerator DamageVisualFlash ()
     {
-        //Color defaultColor = mr.material.color;
-        //mr.material.color = Color.red;
-
         yield return new WaitForEndOfFrame();
-
-        //mr.material.color = defaultColor;
     }
 }
 

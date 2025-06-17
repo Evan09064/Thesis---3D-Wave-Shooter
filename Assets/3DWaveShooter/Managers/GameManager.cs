@@ -15,10 +15,10 @@ using TMPro;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public LevelDataScriptableObject level; //Level data file that relates to this scene.
-    public int waveCountdownTime = 5;       //How long is the countdown before wave starts?
+    public LevelDataScriptableObject level; 
+    public int waveCountdownTime = 5;    
     public float curWaveTime;
-    public float overallAccuracy;//Measuring player accuracy of the entire game
+    public float overallAccuracy;
     public int curWave;
     public int waveCount = 1;
     public bool gameIsActive = false;
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     private int prevWeaponSwitchCount = 0;
     private Dictionary<string,int>   prevUsageCounts = new Dictionary<string,int>();
     private Dictionary<string,float> prevUsageTimes  = new Dictionary<string,float>();
-    private const float PI_CUT = -0.1727f;
+    private const float PI_CUT = 0f;
     private const float MVI_CUT = 2.2081f;
     private const float DPM_CUT = 6.1254f;
     private const float SWITCH_CUT = 2f;
@@ -53,33 +53,30 @@ public class GameManager : MonoBehaviour
     public GameObject rockCoverPrefab;
     public float minSpawnDistance = 2f;
     public float maxSpawnDistance = 5f;
-    public float checkRadius = 1f;    // radius of sphere to test overlaps
-    public float rockScaleFactor = 0.6f;  // shrink prefab by 40%
+    public float checkRadius = 1f;   
+    public float rockScaleFactor = 0.6f; 
 
     [Tooltip("Which layers to treat as obstacles when placing cover.")]
-    public LayerMask obstacleMask;           // only test these layers
+    public LayerMask obstacleMask;          
     [Tooltip("Smaller test sphere radius to cut down physics work.")]
-    private Collider[] _overlapResults = new Collider[8]; // pre-allocated
+    private Collider[] _overlapResults = new Collider[8]; 
     public bool refillAmmoOnNewWave;
 
-    // In GameManager.cs, add at the top of the class:
     [Header("Dart Disruptor (reuse existing enemy)")]
+
     [Tooltip("Which enemy type to turn into a 'dart'")]
-    public GameObject dartEnemyType;            // assign one of your existing enemy prefabs here
+    public GameObject dartEnemyType;          
     [Tooltip("Multiplier applied to moveSpeed for dart enemies")]
     public float dartSpeedMultiplier = 2.0f;
     [Tooltip("Color to tint dart enemies so they stand out")]
     public Color dartColor = Color.green;
 
     [Tooltip("Which enemy prefab to replace when disrupting")]
-    public GameObject fastEnemyPrefab;          // NEW: assign your fast enemy here
+    public GameObject fastEnemyPrefab;         
 
     [HideInInspector]
-    public bool dartReplaceEnabled = false;     // NEW flag
-
-    // internal trackers
+    public bool dartReplaceEnabled = false;     
     private List<GameObject> _activeDarts = new List<GameObject>();
-    //Instance
     public static GameManager inst;
 
     public PerformanceDataOverall overallData = new PerformanceDataOverall();
@@ -104,7 +101,6 @@ public class GameManager : MonoBehaviour
 
     [Tooltip("Multiplier to increase the spawn interval (e.g. 1.2 = +20%)")]
     public float spawnRateMultiplier = 1.75f;
-    // internal state
     private bool _spawnRateReduced = false;
     private float _originalSpawnRate;
 
@@ -126,19 +122,19 @@ public class GameManager : MonoBehaviour
     // When true, every swap triggers an 8 s lock.
     private bool perSwapLockEnabled = false;
 
-    // The weapon (by name) to debuff for the whole wave.
+    // The weapon to debuff for the whole wave.
     public string debuffedWeaponName = null;
 
     [Header("Switch Helper")]
-    public float swapBonusDamageMultiplier = 1.75f;   // e.g. +50% damage
-    public float swapBonusDuration = 10f;             // last 4 seconds
+    public float swapBonusDamageMultiplier = 1.75f;
+    public float swapBonusDuration = 10f;           
 
 
     [Header("Anti-Social (Spread-Out) Settings")]
     
     [Tooltip("When GameManager.inst.spreadEnemiesEnabled == true, enemies will push away from each other.")]
     public bool spreadEnemiesEnabled = false;
-    public float separationRadius = 2.5f;          // how far to look for neighbors
+    public float separationRadius = 2.5f;       
     [Tooltip("Enemies closer than this distance will be pushed apart.")]
     public float desiredSeparation = 2.5f;         // ideal minimum distance between enemies
     [Tooltip("Strength of the repulsion force.")]
@@ -152,7 +148,6 @@ public class GameManager : MonoBehaviour
 
     private PerformanceDataPerWave BuildWaveData(int waveNum)
     {
-        // pull out all your currentDistance/currentTimeMoving/etc logic
         float currentDistance = Player.inst.movement.totalDistanceTraveled;
         float currentTimeMoving = Player.inst.movement.totalTimeMoving;
         float currentTimeIdle = Player.inst.movement.totalTimeIdle;
@@ -178,7 +173,6 @@ public class GameManager : MonoBehaviour
             .Select(kv => new WeaponTime { weaponName = kv.Key, secondsEquipped = kv.Value })
             .ToArray();
 
-        // update the “prev” trackers
         prevDistanceTraveled = currentDistance;
         prevTimeMoving = currentTimeMoving;
         prevTimeIdle = currentTimeIdle;
@@ -186,7 +180,6 @@ public class GameManager : MonoBehaviour
         prevUsageCounts = new Dictionary<string, int>(WeaponUsageStats.WeaponUsageCounts);
         prevUsageTimes = new Dictionary<string, float>(WeaponUsageStats.WeaponUsageTimes);
 
-        // build and return
         return new PerformanceDataPerWave
         {
             waveNumber = waveNum,
@@ -214,31 +207,32 @@ public class GameManager : MonoBehaviour
         StartGame();
     }
 
-   void Update() {
-      if (Input.GetKeyDown(KeyCode.C)) {
-        TogglePause();
-      }
+   void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            TogglePause();
+        }
 
       if (!isPaused && waveInProgress) {
         curWaveTime += Time.deltaTime;
       }
     }
 
-    private void TogglePause() {
+    private void TogglePause()
+    {
       isPaused = !isPaused;
 
-      // freeze or unfreeze everything that uses Time.deltaTime
+     
       Time.timeScale = isPaused ? 0f : 1f;
 
-      // show or hide your pause UI
+      // show or hide pause UI
       pauseGameText.gameObject.SetActive(isPaused);
 
-      // (optional) disable player input when paused
       Player.inst.canMove = !isPaused;
-      Player.inst.canSwap = !isPaused;  // whatever flags control your shooting
+      Player.inst.canSwap = !isPaused;  
       Player.inst.canAttack = !isPaused;
-        // if you had an “openShopButton” being shown on C, hide it when paused
-        GameUI.inst.openShopButton.SetActive(false);
+      GameUI.inst.openShopButton.SetActive(false);
     }
 
     //Called when the game starts.
@@ -443,22 +437,20 @@ public class GameManager : MonoBehaviour
 
         bool highMove   = moveIdleRatio >= MVI_CUT;
         bool highDamage = damagePerMin  >= DPM_CUT;
-        bool highSwitch = switchRate    >= SWITCH_CUT;
+        bool highSwitch = switchRate    > SWITCH_CUT;
 
-        // 3) teardown + dispatch exactly as before
         ConfigureMoveIdleIntervention(highSkill, highMove);
         ConfigureDamageIntervention(highSkill, highDamage);
         ConfigureSwitchIntervention(highSkill, highSwitch);
-
     }
 
     private float ComputeCompositeSkill(PerformanceDataPerWave w1, PerformanceDataPerWave w2)
     {
-        // PCA-derived weights (sum to 1)
-        const float wRT = 0.252f;  // totalRoundTime
-        const float wAcc = 0.25f;  // overallAccuracy
-        const float wDist = 0.246f;  // totalDistanceTraveled
-        const float wART = 0.252f;  // averageRoundTime
+        // Domain-derived weights (sum to 1)
+        const float wRT = 0.25f;  // totalRoundTime
+        const float wAcc = 0.30f;  // overallAccuracy
+        const float wDist = 0.20f;  // totalDistanceTraveled
+        const float wART = 0.25f;  // averageRoundTime
 
         // Pilot means & stddevs (first-two-wave aggregates)
         const float MEAN_RT = 77.4362f, STD_RT = 25.0749f;
@@ -466,13 +458,13 @@ public class GameManager : MonoBehaviour
         const float MEAN_DIST = 205.7390f, STD_DIST = 55.5616f;
         const float MEAN_ART = 38.7181f, STD_ART = 12.5374f;
 
-        // 1) aggregate your two‐wave window
+        // 1) aggregate two‐wave window
         float totalRT   = w1.waveTime + w2.waveTime;
         float avgRT     = totalRT / 2f;
         float totalAcc  = w1.waveAccuracy + w2.waveAccuracy;
         float avgAcc    = totalAcc  / 2f;
         float totalDist = w1.waveDistanceTraveled + w2.waveDistanceTraveled;
-        float avgArt    = avgRT; // if averageRoundTime == avgRT
+        float avgArt    = avgRT;
         
         // 2) compute z-scores (use means/stddevs on the same scale)
         float zRT   = (avgRT  - MEAN_RT)   / STD_RT;
@@ -538,8 +530,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void ConfigureDamageIntervention(bool highSkill, bool highDamage)
     {
-        damageDisruptEnabled = false;
         // ensure any running effect is stopped & speed reset
+        damageDisruptEnabled = false;
         if (_damageDisruptRoutine != null)
         {
             StopCoroutine(_damageDisruptRoutine);
@@ -681,21 +673,10 @@ public class GameManager : MonoBehaviour
             );
             Debug.Log($"  Candidate XZ: {candidate.x:F2}, {candidate.z:F2}");
 
-            // 2) raycast down to ground
-            // if (!Physics.Raycast(candidate + Vector3.up * 10f,
-            //                      Vector3.down,
-            //                      out RaycastHit hit,
-            //                      20f))
-            // {
-            //     Debug.Log("   ✗ No ground below");
-            //     continue;
-            // }
-            // candidate.y = hit.point.y;
-            // Debug.Log($"   ✓ Ground at Y={candidate.y:F2}");
             candidate.y = 0f;
 
 
-            // 3) non-alloc overlap on only obstacleMask
+            // 2) non-alloc overlap on only obstacleMask
             int hitCount = Physics.OverlapSphereNonAlloc(
                 candidate + Vector3.up * (checkRadius * 0.5f),
                 checkRadius,
@@ -714,7 +695,7 @@ public class GameManager : MonoBehaviour
             if (blocked) continue;
 
 
-            // 4) success! spawn and scale
+            // 3) success! spawn and scale
             var rock = Instantiate(rockCoverPrefab, candidate, Quaternion.identity);
             rock.transform.localScale *= rockScaleFactor;
             spawnedRocks.Add(rock);
@@ -729,22 +710,16 @@ public class GameManager : MonoBehaviour
         else
             Debug.Log($"[CoverSpawn] Spawned {spawned}/{count} rocks after {attempts} tries");
     }
-
-    /// <summary>
-    /// 1) Spawn 4 rocks at t=0 (one every 0.5 s),  
-    /// 2) then wait 15 s and spawn 2 rocks (one every 0.5 s),  
-    /// 3) repeat that 2-rock refresh three times.
-    /// </summary>
     private IEnumerator SpawnCoverSequence()
     {
-        // 1) initial burst of 4
-        yield return SpawnRockCover(4, 2.0f);
+        // 1) initial burst of 2
+        yield return SpawnRockCover(2, 2.0f);
 
-        // 2) three refreshes
+        // 2) five refreshes
         for (int refresh = 0; refresh < 4; refresh++)
         {
             yield return new WaitForSeconds(15f);
-            yield return SpawnRockCover(1, 0.5f);
+            yield return SpawnRockCover(2, 0.5f);
         }
     }
 
@@ -838,7 +813,7 @@ public class GameManager : MonoBehaviour
 
     public void EnableDartReplace()
     {
-        CleanupDarts();                         // stop any old darts
+        CleanupDarts();                        
         dartReplaceEnabled = true;
     }
     public void CleanupDarts()
@@ -903,15 +878,10 @@ public class GameManager : MonoBehaviour
         var pts = EnemySpawner.inst.spawnPoints;
         var basePos = pts[UnityEngine.Random.Range(0, pts.Length)].transform.position;
         var spawnPos = basePos + new Vector3(UnityEngine.Random.Range(-1f, 1f), 0, UnityEngine.Random.Range(-1f, 1f));
-
-        // spawn via your pool so performance stays tight
         var go = Pool.Spawn(miniTankPrefab, spawnPos, Quaternion.identity);
         var e = go.GetComponent<Enemy>();
         e.Initialize();
 
-        // (optional) give it a melee aura component here…
-
-        // make sure wave‐complete logic accounts for this extra enemy
         EnemySpawner.inst.remainingEnemies++;
         Debug.Log("Mini-Tank spawned to disrupt high-skill player");
     }
@@ -921,13 +891,12 @@ public class GameManager : MonoBehaviour
         // 1) Disable swapping
         Player.inst.canSwap = false;
 
-        // 2) Show a message (you'll need a quick UI hook)
         GameUI.inst.ShowTemporaryMessage(switchLockMessage, messageDisplayTime);
 
-        // 3) Wait out the lock period
+        // 2) Wait out the lock period
         yield return new WaitForSeconds(switchLockDuration);
 
-        // 4) Re‐enable swapping
+        // 3) Re‐enable swapping
         Player.inst.canSwap = true;
         switchLockRoutine = null;
     }
@@ -986,24 +955,20 @@ public class GameManager : MonoBehaviour
             if (pc == null || pc.type != PickupType.Weapon)
                 continue;
 
-            // get the SO’s displayName (more reliable than prefab name)
             string giveName = pc.baseWeapon != null
                 ? pc.baseWeapon.displayName
                 : pc.weaponToGive.displayName;
 
-            // if we don’t own it yet, add to candidates
             if (!ownedNames.Contains(giveName))
                 candidates.Add(prefab);
         }
 
-        // 3) if nothing left, bail
         if (candidates.Count == 0)
         {
             Debug.Log("All weapons owned; no new pickup spawned.");
             return;
         }
 
-        // 4) pick one at random and spawn via your spawner helper
         var pick = candidates[UnityEngine.Random.Range(0, candidates.Count)];
         Vector3 pos = PickupSpawner.inst.GetRandomSpawnPosition();
         PickupSpawner.inst.SpawnOneWeaponPickup(pick, pos);
