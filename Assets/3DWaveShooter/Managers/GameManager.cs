@@ -455,10 +455,10 @@ public class GameManager : MonoBehaviour
     private float ComputeCompositeSkill(PerformanceDataPerWave w1, PerformanceDataPerWave w2)
     {
         // PCA-derived weights (sum to 1)
-        const float wRT = 0.315f;  // totalRoundTime
-        const float wAcc = 0.062f;  // overallAccuracy
-        const float wDist = 0.308f;  // totalDistanceTraveled
-        const float wART = 0.315f;  // averageRoundTime
+        const float wRT = 0.252f;  // totalRoundTime
+        const float wAcc = 0.25f;  // overallAccuracy
+        const float wDist = 0.246f;  // totalDistanceTraveled
+        const float wART = 0.252f;  // averageRoundTime
 
         // Pilot means & stddevs (first-two-wave aggregates)
         const float MEAN_RT = 77.4362f, STD_RT = 25.0749f;
