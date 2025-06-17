@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -13,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneName: Forest
   levelDisplayName: Forest
-  lockedAtStart: 0
-  levelNeededToCompleteToUnlock: {fileID: 0}
+  lockedAtStart: 1
+  levelNeededToCompleteToUnlock: {fileID: 11400000, guid: 5dec173fa6f7f964583f42c85a197ade,
+    type: 2}
   waves:
   - enemyTypes:
-    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 2}
+    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 3}
       amountToSpawn: 10
     enemySpawnRate: 1
     boss:
@@ -25,9 +27,9 @@ MonoBehaviour:
       boss: {fileID: 0}
       wavePercentToSpawnBoss: 0
   - enemyTypes:
-    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 2}
+    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 3}
       amountToSpawn: 10
-    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 2}
+    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 3}
       amountToSpawn: 10
     enemySpawnRate: 1
     boss:
@@ -35,12 +37,12 @@ MonoBehaviour:
       boss: {fileID: 0}
       wavePercentToSpawnBoss: 100
   - enemyTypes:
-    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 2}
+    - enemy: {fileID: 1959266855851146, guid: 05af4ef2b3c3fb44896073f08dc3b6a0, type: 3}
       amountToSpawn: 20
-    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 2}
+    - enemy: {fileID: 1197425527358990, guid: 68e87a803162e0d4ba2bd71588098c90, type: 3}
       amountToSpawn: 10
     enemySpawnRate: 1
     boss:
       spawnBoss: 1
-      boss: {fileID: 1289459225033430, guid: 005bc74b2ad1a2a4eb067f5bc139512b, type: 2}
+      boss: {fileID: 1289459225033430, guid: 005bc74b2ad1a2a4eb067f5bc139512b, type: 3}
       wavePercentToSpawnBoss: 100
