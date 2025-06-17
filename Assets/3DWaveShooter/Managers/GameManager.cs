@@ -101,8 +101,6 @@ public class GameManager : MonoBehaviour
 
     [Tooltip("Multiplier to increase the spawn interval (e.g. 1.2 = +20%)")]
     public float spawnRateMultiplier = 1.75f;
-    private bool _spawnRateReduced = false;
-    private float _originalSpawnRate;
 
     [Header("Mini-Tank Disrupt")]
 
@@ -144,6 +142,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Pause")]
     public Text pauseGameText;
+
+    [Header("Survey Popup")]
+    [Tooltip("Reference to the SurveyPopupController in the scene")]
+    public SurveyPopupController surveyPopup;
+
+    [Tooltip("Qualtrics URL for the mid-game wave survey")]
+    public string surveyBaseURL;
+    private string sessionID;
+
+    
 
 
     private PerformanceDataPerWave BuildWaveData(int waveNum)
@@ -200,6 +208,8 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         inst = this;
+        // Generate a unique session ID
+        sessionID = Guid.NewGuid().ToString();
     }
 
     void Start()
@@ -211,12 +221,16 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            TogglePause();
+            if (waveInProgress != true)
+            {
+                TogglePause();
+            }
         }
 
-      if (!isPaused && waveInProgress) {
-        curWaveTime += Time.deltaTime;
-      }
+        if (!isPaused && waveInProgress)
+        {
+            curWaveTime += Time.deltaTime;
+        }
     }
 
     private void TogglePause()
@@ -273,6 +287,8 @@ public class GameManager : MonoBehaviour
         curWaveTime = 0.0f;
         curWave = EnemySpawner.inst.nextWaveIndex + 1;
         Player.inst.canMove = false;
+        Player.inst.canAttack = false;
+        Player.inst.canSwap = false;
 
         GameUI.inst.StartCoroutine("SetWaveCountdownText", waveCountdownTime);
         Invoke("StartNextWave", waveCountdownTime + 1);
@@ -295,6 +311,8 @@ public class GameManager : MonoBehaviour
         swapBonusGrantedFor.Clear();
         EnemySpawner.inst.SetNewWave();
         Player.inst.canMove = true;
+        Player.inst.canSwap = true;
+        Player.inst.canAttack = true;
 
         // wave 3: first evaluation on waves 1–2
         if (waveCount == 3 || waveCount == 4)
@@ -341,16 +359,24 @@ public class GameManager : MonoBehaviour
             calibrationWavesSecondary.Add(waveData);
         }
 
-        //Was this the last wave? Then we win!
-        if (EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length)
-            WinGame();
-        //Otherwise enable the next wave button which triggers the next wave.
-        else
-        {
-            GameUI.inst.nextWaveButton.SetActive(true);
-            GameUI.inst.openShopButton.SetActive(true);
-            waveCount++;
-        }
+              // build the survey URL with both userID and waveNumber
+        bool isFinal = EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length;
+        surveyPopup.surveyURL = $"{surveyBaseURL}?userID={sessionID}&waveNumber={waveCount}";
+        surveyPopup.isFinalSurvey = isFinal;
+        surveyPopup.Show();
+    }
+
+    public void OnSurveyContinue()
+    {
+        GameUI.inst.nextWaveButton.SetActive(true);
+        GameUI.inst.openShopButton.SetActive(true);
+        waveCount++;
+    }
+
+    public void OnFinalSurveyContinue()
+    {
+        // After final survey, return to menu or next step
+        WinGame();
     }
     
     IEnumerator SendMetricsToServer(string json)
