@@ -361,7 +361,7 @@ public class GameManager : MonoBehaviour
     
     IEnumerator SendMetricsToServer(string json)
     {
-        var url = "https://<your-project>.glitch.me/collect-metrics";
+        var url = "https://tested-mercury-akubra.glitch.me/collect-metrics";
         using var req = new UnityWebRequest(url, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         req.uploadHandler   = new UploadHandlerRaw(bodyRaw);
