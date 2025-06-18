@@ -28,6 +28,9 @@ public class PerformanceDataPerWave
 public class PerformanceDataOverall {
 
     public string sessionID;
+    public float PI_initial;
+    public float PI_postCM;
+
     public float overallAccuracy;
     public float totalRoundTime;
     public float averageRoundTime;

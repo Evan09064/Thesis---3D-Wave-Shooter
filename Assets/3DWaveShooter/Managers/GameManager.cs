@@ -26,7 +26,10 @@ public class GameManager : MonoBehaviour
     public float prevTimeMoving = 0f;
     public float prevTimeIdle = 0f;
     private int prevWeaponSwitchCount = 0;
-    private Dictionary<string,int>   prevUsageCounts = new Dictionary<string,int>();
+    public float PI_initial;
+    public float PI_postCM;
+
+    private Dictionary<string, int> prevUsageCounts = new Dictionary<string, int>();
     private Dictionary<string,float> prevUsageTimes  = new Dictionary<string,float>();
     private const float PI_CUT = 0f;
     private const float MVI_CUT = 2.2081f;
@@ -395,9 +398,15 @@ public class GameManager : MonoBehaviour
         bool isFinal = EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length;
         surveyPopup.surveyURL = $"{midGameSurveyURL}?userID={sessionID}&waveNumber={waveCount}&phase=mid";
         surveyPopup.isFinalSurvey = false; 
-        surveyPopup.Show();
-        
+        StartCoroutine(ShowMidGameSurveyWithDelay());
     }
+
+    private IEnumerator ShowMidGameSurveyWithDelay()
+    {
+        yield return new WaitForSecondsRealtime(0.6f);
+        surveyPopup.Show();
+    }
+
 
     public void OnSurveyContinue()
     {
@@ -455,6 +464,9 @@ public class GameManager : MonoBehaviour
 
         //Logging all performance metrics
         overallData.sessionID = sessionID;
+        overallData.PI_initial = PI_initial;
+        overallData.PI_postCM = PI_postCM;
+
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
         overallData.totalRoundTime = PerformanceStats.OverallWaveTime;
         overallData.averageRoundTime = PerformanceStats.AverageWaveCompletionTime;
@@ -502,6 +514,16 @@ public class GameManager : MonoBehaviour
         float PI = ComputeCompositeSkill(w1, w2);
         bool highSkill = PI >= PI_CUT;
         Debug.Log($"[PI Evaluation] Composite PI: {PI:F4} (High Skill: {highSkill})");
+        if (waveCount == 3)
+        {
+            PI_initial = PI;
+        }
+        else if (waveCount == 5)
+        {
+            
+            PI_postCM = PI;
+        }
+
 
 
         // 2) Secondary metrics on the same two waves
