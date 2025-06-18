@@ -17,6 +17,9 @@ public class SurveyPopupController : MonoBehaviour
     [HideInInspector]
     public bool isFinalSurvey = false;
 
+    [HideInInspector]
+     public bool isPreSurvey = false;
+
     void Awake()
     {
         popupPanel.SetActive(false);
@@ -45,9 +48,19 @@ public class SurveyPopupController : MonoBehaviour
     {
         popupPanel.SetActive(false);
         Time.timeScale = 1f;
-        if (isFinalSurvey)
+
+        if (isPreSurvey)
+        {
+            GameManager.inst.StartGame();
+        }
+        else if (isFinalSurvey)
+        {
             GameManager.inst.OnFinalSurveyContinue();
+        }
         else
+        {
             GameManager.inst.OnSurveyContinue();
+        }
+        
     }
 }

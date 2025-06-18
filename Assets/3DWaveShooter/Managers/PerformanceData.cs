@@ -26,6 +26,8 @@ public class PerformanceDataPerWave
 
 [System.Serializable]
 public class PerformanceDataOverall {
+
+    public string sessionID;
     public float overallAccuracy;
     public float totalRoundTime;
     public float averageRoundTime;

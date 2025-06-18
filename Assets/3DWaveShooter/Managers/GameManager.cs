@@ -147,8 +147,14 @@ public class GameManager : MonoBehaviour
     [Tooltip("Reference to the SurveyPopupController in the scene")]
     public SurveyPopupController surveyPopup;
 
+    [Tooltip("Qualtrics URL for the pre-game consent survey")]
+    public string preGameSurveyURL;
+
     [Tooltip("Qualtrics URL for the mid-game wave survey")]
-    public string surveyBaseURL;
+    public string midGameSurveyURL;
+
+    [Tooltip("Qualtrics URL for the post-game final survey")]
+    public string postGameSurveyURL;
     private string sessionID;
 
     
@@ -214,7 +220,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        StartGame();
+        surveyPopup.surveyURL = $"{preGameSurveyURL}?userID={sessionID}&phase=pre";
+        surveyPopup.isFinalSurvey = false; 
+        surveyPopup.Show();
     }
 
    void Update()
@@ -359,18 +367,29 @@ public class GameManager : MonoBehaviour
             calibrationWavesSecondary.Add(waveData);
         }
 
-              // build the survey URL with both userID and waveNumber
+        // build the survey URL with both userID and waveNumber
         bool isFinal = EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length;
-        surveyPopup.surveyURL = $"{surveyBaseURL}?userID={sessionID}&waveNumber={waveCount}";
-        surveyPopup.isFinalSurvey = isFinal;
+        surveyPopup.surveyURL = $"{midGameSurveyURL}?userID={sessionID}&waveNumber={waveCount}&phase=mid";
+        surveyPopup.isFinalSurvey = false; 
         surveyPopup.Show();
     }
 
     public void OnSurveyContinue()
     {
-        GameUI.inst.nextWaveButton.SetActive(true);
-        GameUI.inst.openShopButton.SetActive(true);
-        waveCount++;
+        int maxWaves = EnemySpawner.inst.waves.Length;
+
+        if (waveCount < maxWaves)
+        {
+            waveCount++;
+            GameUI.inst.nextWaveButton.SetActive(true);
+            GameUI.inst.openShopButton.SetActive(true);
+        }
+        else
+        {
+            surveyPopup.surveyURL = $"{postGameSurveyURL}?userID={sessionID}&phase=post";
+            surveyPopup.isFinalSurvey = true;
+            surveyPopup.Show();
+        }
     }
 
     public void OnFinalSurveyContinue()
@@ -403,6 +422,7 @@ public class GameManager : MonoBehaviour
         GameUI.inst.openShopButton.SetActive(false);
 
         //Logging all performance metrics
+        overallData.sessionID = sessionID;
         overallData.overallAccuracy = PerformanceStats.OverallAccuracy;
         overallData.totalRoundTime = PerformanceStats.OverallWaveTime;
         overallData.averageRoundTime = PerformanceStats.AverageWaveCompletionTime;

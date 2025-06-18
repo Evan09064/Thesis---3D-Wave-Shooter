@@ -11285,6 +11285,7 @@ MonoBehaviour:
   continueButton: {fileID: 1194944017}
   surveyURL: 
   isFinalSurvey: 0
+  isPreSurvey: 0
 --- !u!4 &1726676800
 Transform:
   m_ObjectHideFlags: 0
@@ -11793,8 +11794,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
+      propertyPath: midGameSurveyURL
+      value: https://leidenuniv.eu.qualtrics.com/jfe/form/SV_9vrpNxtFnNaESKa
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
       propertyPath: minSpawnDistance
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: preGameSurveyURL
+      value: https://leidenuniv.eu.qualtrics.com/jfe/form/SV_6hz1Zpcr6NKkdOm
       objectReference: {fileID: 0}
     - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
@@ -11805,6 +11816,11 @@ PrefabInstance:
         type: 3}
       propertyPath: desiredSeparation
       value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
+        type: 3}
+      propertyPath: postGameSurveyURL
+      value: https://leidenuniv.eu.qualtrics.com/jfe/form/SV_cCt5ywp6s85wAnk
       objectReference: {fileID: 0}
     - target: {fileID: 114491341971590434, guid: e1d73536571b6e64ca162039b530b8fc,
         type: 3}
