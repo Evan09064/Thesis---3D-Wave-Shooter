@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SurveyPopupController : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class SurveyPopupController : MonoBehaviour
     public Button openSurveyButton;
     [Tooltip("Drag the 'Continue' Button here")]
     public Button continueButton;
+    [Tooltip("Drag the text here")]
+    public TextMeshProUGUI popupTitle;
 
     // URL set dynamically by GameManager
     [HideInInspector]
@@ -34,6 +37,10 @@ public class SurveyPopupController : MonoBehaviour
         Player.inst.canMove = false;
         Player.inst.canSwap = false;  
         Player.inst.canAttack = false;
+        if (isFinalSurvey)
+        {
+            popupTitle.text = "Thank you for playing, please complete the final survey, then come back to this tab and click continue to end the game";
+        }
         popupPanel.SetActive(true);
     }
 
@@ -51,7 +58,8 @@ public class SurveyPopupController : MonoBehaviour
 
         if (isPreSurvey)
         {
-            GameManager.inst.StartGame();
+            isPreSurvey = false;
+            GameManager.inst.NextWave();
         }
         else if (isFinalSurvey)
         {

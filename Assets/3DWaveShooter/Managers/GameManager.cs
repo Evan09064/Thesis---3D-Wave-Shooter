@@ -220,19 +220,18 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        surveyPopup.surveyURL = $"{preGameSurveyURL}?userID={sessionID}&phase=pre";
-        surveyPopup.isFinalSurvey = false; 
-        surveyPopup.Show();
+        StartGame();
     }
 
    void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (waveInProgress == true)
-            {
-                TogglePause();
-            }
+            // if (waveInProgress == true)
+            // {
+            //     TogglePause();
+            // }
+            StartCoroutine(ShowPostGameSurveyWithDelay());
         }
 
         if (!isPaused && waveInProgress)
@@ -282,6 +281,9 @@ public class GameManager : MonoBehaviour
         prevDistanceTraveled = 0f;
         prevTimeMoving = 0f;
         prevTimeIdle = 0f;
+        surveyPopup.surveyURL = $"{preGameSurveyURL}?userID={sessionID}&phase=pre";
+        surveyPopup.isFinalSurvey = false;
+        surveyPopup.isPreSurvey = true;
         SetNextWave();
         GameUI.inst.openShopButton.SetActive(false);
     }
@@ -298,6 +300,26 @@ public class GameManager : MonoBehaviour
         Player.inst.canAttack = false;
         Player.inst.canSwap = false;
 
+        if (surveyPopup.isPreSurvey == true)
+        {
+            StartCoroutine(ShowPreSurveyDelayed());
+        }
+        else
+        {
+            NextWave();
+        }
+
+    }
+
+    private IEnumerator ShowPreSurveyDelayed()
+    {
+        yield return new WaitForSecondsRealtime(0.6f);
+        surveyPopup.Show();
+    }
+
+
+    public void NextWave()
+    {
         GameUI.inst.StartCoroutine("SetWaveCountdownText", waveCountdownTime);
         Invoke("StartNextWave", waveCountdownTime + 1);
     }
@@ -343,9 +365,11 @@ public class GameManager : MonoBehaviour
         PerformanceStats.EndWave();   // finishes timing + increments CompletedWaves
         CleanupCoverRocks();
 
-        var allPickups = FindObjectsByType<Pickup>(FindObjectsSortMode.None);
-        foreach (var pickup in allPickups)
+        foreach (var pickup in FindObjectsByType<Pickup>(FindObjectsSortMode.None))
+        {
             Destroy(pickup.gameObject);
+        }
+
 
         // 1) build the wave object
         var waveData = BuildWaveData(waveCount);
@@ -372,6 +396,7 @@ public class GameManager : MonoBehaviour
         surveyPopup.surveyURL = $"{midGameSurveyURL}?userID={sessionID}&waveNumber={waveCount}&phase=mid";
         surveyPopup.isFinalSurvey = false; 
         surveyPopup.Show();
+        
     }
 
     public void OnSurveyContinue()
@@ -386,10 +411,17 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            surveyPopup.surveyURL = $"{postGameSurveyURL}?userID={sessionID}&phase=post";
-            surveyPopup.isFinalSurvey = true;
-            surveyPopup.Show();
+            // Delay post-game survey slightly so user can register change
+            StartCoroutine(ShowPostGameSurveyWithDelay());
         }
+    }
+
+    private IEnumerator ShowPostGameSurveyWithDelay()
+    {
+        yield return new WaitForSecondsRealtime(0.5f); // Unscaled time due to Time.timeScale = 0
+        surveyPopup.surveyURL = $"{postGameSurveyURL}?userID={sessionID}&phase=post";
+        surveyPopup.isFinalSurvey = true;
+        surveyPopup.Show();
     }
 
     public void OnFinalSurveyContinue()

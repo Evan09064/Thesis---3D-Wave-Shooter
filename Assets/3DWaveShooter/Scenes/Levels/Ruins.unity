@@ -9772,8 +9772,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Before contuining, please complete the survey for this wave. Once completed,
-    come back to this tab and press continue.
+  m_text: 'Before contuining, please complete this survey. Once completed, you can
+    close the survey tab, come back to this tab and press continue.
 
 '
   m_isRightToLeft: 0
@@ -11283,6 +11283,7 @@ MonoBehaviour:
   popupPanel: {fileID: 2087365644}
   openSurveyButton: {fileID: 1764509242}
   continueButton: {fileID: 1194944017}
+  popupTitle: {fileID: 1477334820}
   surveyURL: 
   isFinalSurvey: 0
   isPreSurvey: 0
