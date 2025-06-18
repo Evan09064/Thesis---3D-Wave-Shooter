@@ -221,7 +221,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (waveInProgress != true)
+            if (waveInProgress == true)
             {
                 TogglePause();
             }

@@ -13501,6 +13501,16 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 1847
       objectReference: {fileID: 0}
+    - target: {fileID: 114030316125674176, guid: 470760f69eb10174b90f56340f10ccc1,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114030316125674176, guid: 470760f69eb10174b90f56340f10ccc1,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 114034866244534384, guid: 470760f69eb10174b90f56340f10ccc1,
         type: 3}
       propertyPath: target
@@ -13634,7 +13644,7 @@ PrefabInstance:
     - target: {fileID: 224536191187201178, guid: 470760f69eb10174b90f56340f10ccc1,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.5
+      value: -0.49993896
       objectReference: {fileID: 0}
     - target: {fileID: 224607064542490266, guid: 470760f69eb10174b90f56340f10ccc1,
         type: 3}
