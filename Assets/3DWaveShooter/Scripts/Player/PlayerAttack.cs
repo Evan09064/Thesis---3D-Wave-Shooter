@@ -132,7 +132,6 @@ public class PlayerAttack : MonoBehaviour
             }
             PerformanceStats.RoundShotsFired++;
             PerformanceStats.OverallShotsFired++;
-            Debug.Log($"[DEBUG] Shot fired (weapon = {Player.inst.curWeapon.displayName}) → TotalShotsFired = {PerformanceStats.OverallShotsFired}");
         }
             
 

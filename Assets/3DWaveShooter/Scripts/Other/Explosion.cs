@@ -39,8 +39,6 @@ public class Explosion : MonoBehaviour
         {
             PerformanceStats.RoundShotsHit++;
             PerformanceStats.OverallShotsHit++;
-            Debug.Log($"[DEBUG] Shot hit (weapon = {Player.inst.curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
-           
         }
 
         //Loop through them all.

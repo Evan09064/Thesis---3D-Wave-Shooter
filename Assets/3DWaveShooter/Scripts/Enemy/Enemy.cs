@@ -75,7 +75,6 @@ public class Enemy : MonoBehaviour
                     PerformanceStats.shotgunHitCountedThisClick = true;
                     PerformanceStats.RoundShotsHit++;
                     PerformanceStats.OverallShotsHit++;
-                    Debug.Log($"[DEBUG] Shotgun shot hit → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
                 }
              // else: we’ve already counted this click’s hit, so do nothing here
              }
@@ -84,7 +83,6 @@ public class Enemy : MonoBehaviour
                 // All non‐shotgun weapons just auto‐count normally:
                 PerformanceStats.RoundShotsHit++;
                 PerformanceStats.OverallShotsHit++;
-                Debug.Log($"[DEBUG] Shot hit (weapon = {curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
             }
         }
 
@@ -117,7 +115,6 @@ public class Enemy : MonoBehaviour
                     PerformanceStats.shotgunHitCountedThisClick = true;
                     PerformanceStats.RoundShotsHit++;
                     PerformanceStats.OverallShotsHit++;
-                    Debug.Log($"[DEBUG] Shotgun shot hit → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
                 }
             // else: we’ve already counted this click’s hit, so do nothing here
             }
@@ -126,7 +123,6 @@ public class Enemy : MonoBehaviour
                 // All non‐shotgun weapons just auto‐count normally:
                 PerformanceStats.RoundShotsHit++;
                 PerformanceStats.OverallShotsHit++;
-                Debug.Log($"[DEBUG] Shot hit (weapon = {curWeapon.displayName}) → TotalShotsHit = {PerformanceStats.OverallShotsHit}");
             }
         }
 

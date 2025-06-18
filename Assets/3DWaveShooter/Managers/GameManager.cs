@@ -501,6 +501,8 @@ public class GameManager : MonoBehaviour
         // 1) Composite Skill (PI) on those two waves
         float PI = ComputeCompositeSkill(w1, w2);
         bool highSkill = PI >= PI_CUT;
+        Debug.Log($"[PI Evaluation] Composite PI: {PI:F4} (High Skill: {highSkill})");
+
 
         // 2) Secondary metrics on the same two waves
         float totalMoving   = w1.waveTimeMoving   + w2.waveTimeMoving;
