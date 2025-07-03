@@ -142,6 +142,7 @@ public class GameManager : MonoBehaviour
     public float antiSocialCoefficient = 1.0f;     // multiplier for repulsion
     private HashSet<string> swapBonusGrantedFor = new HashSet<string>();
     private bool isPaused = false;
+    private bool shopButtonWasActive;
 
     [Header("Pause")]
     public Text pauseGameText;
@@ -230,11 +231,10 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            // if (waveInProgress == true)
-            // {
-            //     TogglePause();
-            // }
-            StartCoroutine(ShowPostGameSurveyWithDelay());
+            if (waveInProgress == true)
+            {
+                 TogglePause();
+            }
         }
 
         if (!isPaused && waveInProgress)
@@ -245,18 +245,35 @@ public class GameManager : MonoBehaviour
 
     private void TogglePause()
     {
-      isPaused = !isPaused;
+        isPaused = !isPaused;
+      
+      if (isPaused)
+        {
+            // 1. Cache current state
+            shopButtonWasActive = GameUI.inst.openShopButton.activeSelf;
 
-     
-      Time.timeScale = isPaused ? 0f : 1f;
+            // 2. Do the pause
+            Time.timeScale = 0f;
+            pauseGameText.gameObject.SetActive(true);
+            Player.inst.canMove   = false;
+            Player.inst.canSwap   = false;
+            Player.inst.canAttack = false;
 
-      // show or hide pause UI
-      pauseGameText.gameObject.SetActive(isPaused);
+            // 3. Hide shop button
+            GameUI.inst.openShopButton.SetActive(false);
+        }
+        else
+        {
+            // 4. Resume time & controls
+            Time.timeScale = 1f;
+            pauseGameText.gameObject.SetActive(false);
+            Player.inst.canMove   = true;
+            Player.inst.canSwap   = true;
+            Player.inst.canAttack = true;
 
-      Player.inst.canMove = !isPaused;
-      Player.inst.canSwap = !isPaused;  
-      Player.inst.canAttack = !isPaused;
-      GameUI.inst.openShopButton.SetActive(false);
+            // 5. Restore shop button to its pre-pause state
+            GameUI.inst.openShopButton.SetActive(shopButtonWasActive);
+        }
     }
 
     //Called when the game starts.
@@ -397,9 +414,8 @@ public class GameManager : MonoBehaviour
         // build the survey URL with both userID and waveNumber
         bool isFinal = EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length;
         surveyPopup.surveyURL = $"{midGameSurveyURL}?userID={sessionID}&waveNumber={waveCount}&phase=mid";
-        surveyPopup.isFinalSurvey = false;
+        surveyPopup.isFinalSurvey = false; 
         StartCoroutine(ShowMidGameSurveyWithDelay());
-        waveCount++;
     }
 
     private IEnumerator ShowMidGameSurveyWithDelay()
@@ -411,28 +427,20 @@ public class GameManager : MonoBehaviour
 
     public void OnSurveyContinue()
     {
-        // how many waves defined in level (5)
-        int totalWaves = EnemySpawner.inst.waves.Length;
-        // nextWaveIndex is zero‐based: 0=new wave1, 1=new wave2, …, totalWaves=new done
-        int nextIndex  = EnemySpawner.inst.nextWaveIndex;
+        int maxWaves = EnemySpawner.inst.waves.Length;
 
-        Debug.Log($"[Debug] OnSurveyContinue: nextWaveIndex={nextIndex}, totalWaves={totalWaves}");
-
-        if (nextIndex < totalWaves)
+        if (waveCount < maxWaves)
         {
-            // still have more waves to run
-            // hide the survey UI and go straight into the next wave
-            surveyPopup.isPreSurvey  = false;
-            surveyPopup.isFinalSurvey = false;
-            SetNextWave();    
+            waveCount++;
+            GameUI.inst.nextWaveButton.SetActive(true);
+            GameUI.inst.openShopButton.SetActive(true);
         }
         else
         {
-            // we’ve exhausted all waves → final survey
+            // Delay post-game survey slightly so user can register change
             StartCoroutine(ShowPostGameSurveyWithDelay());
         }
     }
-
 
     private IEnumerator ShowPostGameSurveyWithDelay()
     {
@@ -598,11 +606,8 @@ public class GameManager : MonoBehaviour
     /// Quadrant III: Low Skill × Low Move  → Assist (spawn speed‐boost)
     /// Quadrant IV: High Skill × Low Move  → Disrupt (dart enemies)
     /// </summary>
-    private Coroutine _coverRoutine;
     private void ConfigureMoveIdleIntervention(bool highSkill, bool highMove)
     {
-        // 0) stop any in-flight cover spawns
-        if (_coverRoutine != null) { StopCoroutine(_coverRoutine); _coverRoutine = null; }
         // 1) Tear down whatever was running before
         if (speedBoostRoutine != null)
         {
