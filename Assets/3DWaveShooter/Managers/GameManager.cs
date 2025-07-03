@@ -31,10 +31,10 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<string, int> prevUsageCounts = new Dictionary<string, int>();
     private Dictionary<string,float> prevUsageTimes  = new Dictionary<string,float>();
-    private const float PI_CUT = 0f;
+    private const float PI_CUT = -0.987f;
     private const float MVI_CUT = 2.2081f;
     private const float DPM_CUT = 6.1254f;
-    private const float SWITCH_CUT = 2f;
+    private const float SWITCH_CUT = 9.92f;
 
     // at the top of GameManager
     private Coroutine speedBoostRoutine;
@@ -397,8 +397,9 @@ public class GameManager : MonoBehaviour
         // build the survey URL with both userID and waveNumber
         bool isFinal = EnemySpawner.inst.nextWaveIndex == EnemySpawner.inst.waves.Length;
         surveyPopup.surveyURL = $"{midGameSurveyURL}?userID={sessionID}&waveNumber={waveCount}&phase=mid";
-        surveyPopup.isFinalSurvey = false; 
+        surveyPopup.isFinalSurvey = false;
         StartCoroutine(ShowMidGameSurveyWithDelay());
+        waveCount++;
     }
 
     private IEnumerator ShowMidGameSurveyWithDelay()
@@ -410,20 +411,28 @@ public class GameManager : MonoBehaviour
 
     public void OnSurveyContinue()
     {
-        int maxWaves = EnemySpawner.inst.waves.Length;
+        // how many waves defined in level (5)
+        int totalWaves = EnemySpawner.inst.waves.Length;
+        // nextWaveIndex is zero‐based: 0=new wave1, 1=new wave2, …, totalWaves=new done
+        int nextIndex  = EnemySpawner.inst.nextWaveIndex;
 
-        if (waveCount < maxWaves)
+        Debug.Log($"[Debug] OnSurveyContinue: nextWaveIndex={nextIndex}, totalWaves={totalWaves}");
+
+        if (nextIndex < totalWaves)
         {
-            waveCount++;
-            GameUI.inst.nextWaveButton.SetActive(true);
-            GameUI.inst.openShopButton.SetActive(true);
+            // still have more waves to run
+            // hide the survey UI and go straight into the next wave
+            surveyPopup.isPreSurvey  = false;
+            surveyPopup.isFinalSurvey = false;
+            SetNextWave();    
         }
         else
         {
-            // Delay post-game survey slightly so user can register change
+            // we’ve exhausted all waves → final survey
             StartCoroutine(ShowPostGameSurveyWithDelay());
         }
     }
+
 
     private IEnumerator ShowPostGameSurveyWithDelay()
     {
@@ -539,7 +548,7 @@ public class GameManager : MonoBehaviour
 
         bool highMove   = moveIdleRatio >= MVI_CUT;
         bool highDamage = damagePerMin  >= DPM_CUT;
-        bool highSwitch = switchRate    > SWITCH_CUT;
+        bool highSwitch = switchRate    >= SWITCH_CUT;
 
         ConfigureMoveIdleIntervention(highSkill, highMove);
         ConfigureDamageIntervention(highSkill, highDamage);
@@ -589,8 +598,11 @@ public class GameManager : MonoBehaviour
     /// Quadrant III: Low Skill × Low Move  → Assist (spawn speed‐boost)
     /// Quadrant IV: High Skill × Low Move  → Disrupt (dart enemies)
     /// </summary>
+    private Coroutine _coverRoutine;
     private void ConfigureMoveIdleIntervention(bool highSkill, bool highMove)
     {
+        // 0) stop any in-flight cover spawns
+        if (_coverRoutine != null) { StopCoroutine(_coverRoutine); _coverRoutine = null; }
         // 1) Tear down whatever was running before
         if (speedBoostRoutine != null)
         {
