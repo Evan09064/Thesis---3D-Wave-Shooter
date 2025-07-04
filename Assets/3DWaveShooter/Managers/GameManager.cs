@@ -161,6 +161,8 @@ public class GameManager : MonoBehaviour
     public string postGameSurveyURL;
     private string sessionID;
 
+    private Dictionary<string, int> originalClipSizes = new Dictionary<string, int>();
+
     
 
 
@@ -227,13 +229,13 @@ public class GameManager : MonoBehaviour
         StartGame();
     }
 
-   void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
             if (waveInProgress == true)
             {
-                 TogglePause();
+                TogglePause();
             }
         }
 
@@ -389,6 +391,21 @@ public class GameManager : MonoBehaviour
         {
             Destroy(pickup.gameObject);
         }
+
+        foreach (var kv in originalClipSizes)
+        {
+            var weapon = Player.inst.weapons
+                .FirstOrDefault(w => w.displayName.Equals(kv.Key, StringComparison.OrdinalIgnoreCase));
+            if (weapon != null)
+            {
+                weapon.clipSize = kv.Value;
+                // also ensure current ammo doesn't exceed restored clip:
+                weapon.curAmmoInClip = Mathf.Min(weapon.curAmmoInClip, weapon.clipSize);
+                Debug.Log($"Restored '{kv.Key}' clip size to {kv.Value}");
+            }
+        }
+        originalClipSizes.Clear();
+        debuffedWeaponName = null;
 
 
         // 1) build the wave object
@@ -745,6 +762,8 @@ public class GameManager : MonoBehaviour
             // 2) Permanently halve its magazine capacity for this wave:
             var pw = Player.inst.weapons
                 .FirstOrDefault(w => w.displayName.Equals(mostUsed, StringComparison.OrdinalIgnoreCase));
+
+            originalClipSizes[mostUsed] = pw.clipSize;
 
             // halve the clipSize
             pw.clipSize      = Mathf.Max(1, pw.clipSize / 2);
